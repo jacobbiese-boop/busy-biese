@@ -1,0 +1,729 @@
+---
+import Base from '../../layouts/Base.astro';
+import Photo from '../../components/Photo.astro';
+import Icon from '../../components/Icon.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import { products, getCategory, relatedProducts, type Product } from '../../data/menu';
+import { site } from '../../config/site';
+import { availablePhotos, photoUrl, photoSrcset, firstPhoto } from '../../lib/photos';
+import { money, each, perItem, priceLabel, bestPerItem, sentenceList } from '../../lib/format';
+import { productJsonLd, breadcrumbJsonLd, faqJsonLd } from '../../lib/seo';
+
+export function getStaticPaths() {
+  return products.map((product) => ({ params: { slug: product.slug }, props: { product } }));
+}
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const category = getCategory(product.category);
+const photos = availablePhotos(product.photos);
+const related = relatedProducts(product, 3);
+const best = bestPerItem(product);
+const showEach = product.tiers.some((t) => perItem(t) !== undefined);
+const servingGuide = product.tiers.filter((t) => t.serves);
+const orderHref = `/order/?item=${encodeURIComponent(product.name)}`;
+const leadPhoto = firstPhoto(product.photos);
+const ogImage = leadPhoto ? `/photos/${leadPhoto}-og.jpg` : undefined;
+const description = `${product.short} ${priceLabel(product)}. Made to order in ${site.location.city}, IL.`;
+
+const ld = [
+  productJsonLd(product, Astro.site),
+  breadcrumbJsonLd(
+    [
+      { name: 'Home', path: '/' },
+      { name: 'Menu', path: '/menu/' },
+      { name: product.name, path: `/menu/${product.slug}/` },
+    ],
+    Astro.site,
+  ),
+  ...(product.faq.length ? [faqJsonLd(product.faq)] : []),
+];
+---
+
+<Base
+  title={product.name}
+  description={description}
+  image={ogImage}
+  imageAlt={product.name}
+  ogType="product"
+  jsonLd={ld}
+>
+  <section class="product">
+    <div class="container">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <ol role="list">
+          <li><a href="/menu/">Menu</a></li>
+          <li><a href={`/menu/#${category.id}`}>{category.name}</a></li>
+          <li><span aria-current="page">{product.name}</span></li>
+        </ol>
+      </nav>
+
+      <div class="product-grid">
+        <div class="gallery" data-gallery>
+          <div class="gallery-main">
+            <Photo
+              names={product.photos}
+              alt={product.name}
+              icon={category.icon}
+              ratio="1 / 1"
+              eager
+              sizes="(min-width: 900px) 560px, 100vw"
+            />
+            {
+              product.badges && product.badges.length > 0 && (
+                <div class="badges">
+                  {product.badges.map((b) => (
+                    <span class:list={['badge', b === 'Halal' ? 'badge-dark' : 'badge-honey']}>{b}</span>
+                  ))}
+                </div>
+              )
+            }
+          </div>
+          {
+            photos.length > 1 && (
+              <ul class="thumbs" role="list">
+                {photos.map((p, i) => (
+                  <li>
+                    <button
+                      type="button"
+                      class:list={['thumb', i === 0 && 'is-active']}
+                      data-src={photoUrl(p, 800)}
+                      data-srcset={photoSrcset(p)}
+                      aria-label={`Show photo ${i + 1} of ${photos.length}`}
+                      aria-pressed={i === 0 ? 'true' : 'false'}
+                    >
+                      <img src={photoUrl(p, 800)} alt="" width="120" height="120" loading="lazy" decoding="async" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )
+          }
+        </div>
+
+        <div class="summary">
+          <p class="eyebrow">{category.name}</p>
+          <h1>{product.name}</h1>
+          <p class="lead">{product.short}</p>
+
+          <div class="price-block">
+            <div>
+              <p class="price">{priceLabel(product)}</p>
+              {best && <p class="price-sub">As low as {each(best)} per {product.unit ?? 'item'}</p>}
+            </div>
+            {product.minimum && <p class="minimum">{product.minimum}</p>}
+          </div>
+
+          <table class="tiers">
+            <caption class="visually-hidden">Prices for {product.name}</caption>
+            <thead>
+              <tr>
+                <th scope="col">Size</th>
+                <th scope="col">Price</th>
+                {showEach && <th scope="col">Each</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {
+                product.tiers.map((t) => {
+                  const unit = perItem(t);
+                  return (
+                    <tr>
+                      <th scope="row">{t.label}</th>
+                      <td>{money(t.price)}</td>
+                      {showEach && <td class="each">{unit ? each(unit) : ''}</td>}
+                    </tr>
+                  );
+                })
+              }
+            </tbody>
+          </table>
+
+          {
+            product.flavors && (
+              <div class="option-group">
+                <p class="option-label">Flavors</p>
+                <ul class="chips" role="list">
+                  {product.flavors.map((f) => (
+                    <li class="chip">{f}</li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+
+          {
+            product.addOns && (
+              <div class="option-group">
+                <p class="option-label">Add-ons</p>
+                <ul class="addons" role="list">
+                  {product.addOns.map((a) => (
+                    <li>
+                      <span>{a.label}</span>
+                      <span>
+                        +{money(a.price)}
+                        {a.note ? ` ${a.note}` : ''}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+
+          <div class="btn-row cta">
+            <a class="btn" href={orderHref}>Order this <Icon name="arrow" class="arrow" /></a>
+            <a class="btn btn-outline" href={site.links.whatsapp} target="_blank" rel="noopener">
+              <Icon name="chat" /> Ask a question
+            </a>
+          </div>
+
+          <ul class="assurances" role="list">
+            <li>
+              <Icon name="clock" size={20} />
+              <span><strong>Lead time:</strong> {product.leadTime}</span>
+            </li>
+            <li>
+              <Icon name="truck" size={20} />
+              <span>
+                Pickup in {site.location.city} or delivery within {site.delivery.radiusMiles} miles. <a
+                  href="/policies/#delivery">Delivery fees</a
+                >
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="details">
+    <div class="container details-grid">
+      <div class="detail-main">
+        <h2>About this item</h2>
+        <p>{product.description}</p>
+        <div class="highlight">
+          <Icon name="sparkle" size={22} />
+          <p><strong>Why it's special.</strong> {product.highlight}</p>
+        </div>
+
+        {
+          product.greatFor.length > 0 && (
+            <>
+              <h3>Great for</h3>
+              <ul class="chips" role="list">
+                {product.greatFor.map((g) => (
+                  <li class="chip">{g}</li>
+                ))}
+              </ul>
+            </>
+          )
+        }
+
+        {
+          servingGuide.length > 0 && (
+            <>
+              <h3>Serving guide</h3>
+              <ul class="plain-list" role="list">
+                {servingGuide.map((t) => (
+                  <li>
+                    <Icon name="users" size={18} /> {t.label} serves about {t.serves}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )
+        }
+
+        {
+          product.notes && (
+            <>
+              <h3>Good to know</h3>
+              <ul class="plain-list" role="list">
+                {product.notes.map((n) => (
+                  <li>
+                    <Icon name="hex" size={18} /> {n}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )
+        }
+
+        {
+          product.faq.length > 0 && (
+            <div class="faq">
+              <h2>Questions</h2>
+              {product.faq.map((f, i) => (
+                <details open={i === 0}>
+                  <summary>
+                    {f.q}
+                    <Icon name="plus" size={20} class="faq-icon" />
+                  </summary>
+                  <p>{f.a}</p>
+                </details>
+              ))}
+            </div>
+          )
+        }
+      </div>
+
+      <aside class="detail-side">
+        <div class="side-card">
+          <h2 class="side-title">Ingredients</h2>
+          <p>{sentenceList(product.ingredients)}.</p>
+          <h2 class="side-title">Allergens</h2>
+          <p><strong>Contains:</strong> {sentenceList(product.allergens)}.</p>
+          <p class="tiny muted">
+            Made in a kitchen that also handles wheat, dairy, eggs, soy, and tree nuts. <a href="/policies/#allergens"
+              >Allergen info</a
+            >
+          </p>
+          {
+            product.dietary.length > 0 && (
+              <ul class="chips" role="list">
+                {product.dietary.map((d) => (
+                  <li class="chip">
+                    <Icon name={d === 'Halal' ? 'check-badge' : d === 'Vegetarian' ? 'leaf' : 'cup'} size={16} />
+                    &nbsp;{d}
+                  </li>
+                ))}
+              </ul>
+            )
+          }
+        </div>
+        {
+          (product.storage || product.freshness) && (
+            <div class="side-card">
+              <h2 class="side-title">Storage &amp; freshness</h2>
+              {product.storage && <p>{product.storage}</p>}
+              {product.freshness && (
+                <p class="fresh">
+                  <Icon name="clock" size={18} /> {product.freshness}
+                </p>
+              )}
+            </div>
+          )
+        }
+      </aside>
+    </div>
+  </section>
+
+  {
+    related.length > 0 && (
+      <section class="section-tight related">
+        <div class="container">
+          <div class="related-head">
+            <h2>You might also like</h2>
+            <a class="text-link" href="/menu/">
+              Full menu <Icon name="arrow" />
+            </a>
+          </div>
+          <div class="grid grid-3">
+            {related.map((p) => (
+              <ProductCard product={p} />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+</Base>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((gallery) => {
+    const main = gallery.querySelector<HTMLImageElement>('.gallery-main img');
+    const thumbs = gallery.querySelectorAll<HTMLButtonElement>('.thumb');
+    thumbs.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (!main) return;
+        main.src = btn.dataset.src || main.src;
+        main.srcset = btn.dataset.srcset || '';
+        thumbs.forEach((t) => {
+          t.classList.toggle('is-active', t === btn);
+          t.setAttribute('aria-pressed', String(t === btn));
+        });
+      });
+    });
+  });
+</script>
+
+<style>
+  .product {
+    padding: clamp(24px, 4vw, 48px) 0 clamp(48px, 6vw, 80px);
+  }
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0 0 24px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .crumbs li + li::before {
+    content: '/';
+    margin-right: 6px;
+    color: var(--line-strong);
+  }
+  .crumbs a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .crumbs a:hover {
+    color: var(--ink);
+  }
+  .crumbs [aria-current] {
+    color: var(--ink);
+  }
+
+  .product-grid {
+    display: grid;
+    gap: clamp(28px, 5vw, 64px);
+    align-items: start;
+  }
+  @media (min-width: 900px) {
+    .product-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .gallery {
+      position: sticky;
+      top: 100px;
+    }
+  }
+
+  .gallery-main {
+    position: relative;
+    border-radius: var(--radius-l);
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .badges {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .thumbs {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .thumb {
+    width: 76px;
+    height: 76px;
+    padding: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    background: var(--oat);
+    cursor: pointer;
+    opacity: 0.75;
+    transition:
+      opacity 0.2s var(--ease),
+      border-color 0.2s var(--ease);
+  }
+  .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .thumb:hover,
+  .thumb.is-active {
+    opacity: 1;
+  }
+  .thumb.is-active {
+    border-color: var(--honey);
+  }
+
+  .summary h1 {
+    font-size: clamp(2.1rem, 3.2vw + 1rem, 3.4rem);
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    margin-bottom: 14px;
+  }
+  .summary .lead {
+    margin-bottom: 24px;
+  }
+
+  .price-block {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px 20px;
+    padding: 18px 0;
+    border-block: 1px solid var(--line);
+    margin-bottom: 20px;
+  }
+  .price {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 540;
+    line-height: 1;
+    margin: 0;
+  }
+  .price-sub {
+    margin: 8px 0 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .minimum {
+    margin: 0;
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--honey-deep);
+    background: var(--honey-wash);
+    border-radius: 999px;
+    padding: 6px 12px;
+  }
+
+  .tiers {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 22px;
+    font-size: 0.97rem;
+  }
+  .tiers th,
+  .tiers td {
+    padding: 13px 18px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+  }
+  .tiers tbody tr:last-child th,
+  .tiers tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  .tiers thead th {
+    font-size: var(--step-tiny);
+    font-weight: 750;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--oat);
+  }
+  .tiers tbody th {
+    font-weight: 650;
+  }
+  .tiers td {
+    font-family: var(--font-display);
+    font-size: 1.12rem;
+    font-weight: 540;
+  }
+  .tiers td.each {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  .option-group {
+    margin-bottom: 20px;
+  }
+  .option-label {
+    font-size: var(--step-tiny);
+    font-weight: 750;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 10px;
+  }
+  .addons li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px dashed var(--line-strong);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .addons li span:last-child {
+    color: var(--muted);
+  }
+
+  .cta {
+    margin: 26px 0 22px;
+  }
+  .assurances {
+    display: grid;
+    gap: 12px;
+    font-size: 0.93rem;
+    color: var(--ink-2);
+  }
+  .assurances li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .assurances :global(svg) {
+    flex: none;
+    color: var(--honey-deep);
+    margin-top: 2px;
+  }
+
+  /* Details */
+  .details {
+    background: var(--paper);
+    border-top: 1px solid var(--line);
+    padding-block: clamp(48px, 6vw, 88px);
+  }
+  .details-grid {
+    display: grid;
+    gap: clamp(28px, 5vw, 64px);
+    align-items: start;
+  }
+  @media (min-width: 900px) {
+    .details-grid {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    }
+  }
+  .detail-main h2 {
+    font-size: var(--step-3);
+  }
+  .detail-main > p {
+    font-size: var(--step-1);
+    color: var(--ink-2);
+  }
+  .detail-main h3 {
+    font-family: var(--font-body);
+    font-size: var(--step-tiny);
+    font-weight: 750;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 30px 0 12px;
+  }
+  .highlight {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: var(--honey-wash);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin: 24px 0 8px;
+  }
+  .highlight :global(svg) {
+    flex: none;
+    color: var(--honey-deep);
+    margin-top: 2px;
+  }
+  .highlight p {
+    margin: 0;
+    color: var(--ink-2);
+  }
+  .plain-list {
+    display: grid;
+    gap: 8px;
+  }
+  .plain-list li {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    color: var(--ink-2);
+  }
+  .plain-list :global(svg) {
+    flex: none;
+    color: var(--honey-deep);
+  }
+
+  .faq {
+    margin-top: 44px;
+  }
+  .faq details {
+    border-bottom: 1px solid var(--line);
+  }
+  .faq details:first-of-type {
+    border-top: 1px solid var(--line);
+  }
+  .faq summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 0;
+    font-weight: 700;
+    font-size: 1.02rem;
+    cursor: pointer;
+    list-style: none;
+  }
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq summary :global(.faq-icon) {
+    flex: none;
+    color: var(--honey-deep);
+    transition: transform 0.25s var(--ease);
+  }
+  .faq details[open] summary :global(.faq-icon) {
+    transform: rotate(45deg);
+  }
+  .faq details p {
+    margin: 0 0 18px;
+    color: var(--ink-2);
+    max-width: 62ch;
+  }
+
+  .side-card {
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 22px 18px;
+    margin-bottom: 16px;
+  }
+  .side-title {
+    font-family: var(--font-body);
+    font-size: var(--step-tiny);
+    font-weight: 750;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 8px;
+  }
+  .side-card p {
+    color: var(--ink-2);
+    font-size: 0.95rem;
+  }
+  .side-card p.tiny {
+    font-size: var(--step-tiny);
+  }
+  .side-card .chip {
+    gap: 2px;
+  }
+  .side-card .chip :global(svg) {
+    color: var(--honey-deep);
+  }
+  .fresh {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-weight: 650;
+  }
+  .fresh :global(svg) {
+    color: var(--honey-deep);
+    flex: none;
+  }
+
+  .related-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .related-head h2 {
+    margin: 0;
+  }
+</style>

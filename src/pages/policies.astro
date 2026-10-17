@@ -1,0 +1,230 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../config/site';
+import { breadcrumbJsonLd } from '../lib/seo';
+
+const { radiusMiles, flatFee, flatFeeUpTo, percentOver, windows } = site.delivery;
+const updated = 'October 2026';
+const sections = [
+  { id: 'ordering', label: 'Ordering' },
+  { id: 'pickup', label: 'Pickup' },
+  { id: 'delivery', label: 'Delivery' },
+  { id: 'allergens', label: 'Allergens' },
+  { id: 'storage', label: 'Storage' },
+  { id: 'changes', label: 'Changes' },
+];
+---
+
+<Base
+  title="Delivery & Order Policy"
+  description={`How ordering, pickup, and delivery work at Busy Biese. Delivery within ${radiusMiles} miles of ${site.location.city}, IL. Please order ${site.ordering.noticeHours} hours ahead.`}
+  jsonLd={breadcrumbJsonLd(
+    [
+      { name: 'Home', path: '/' },
+      { name: 'Delivery & Order Policy', path: '/policies/' },
+    ],
+    Astro.site,
+  )}
+>
+  <PageHero
+    eyebrow="Policies"
+    title="Delivery &amp; <em>order policy</em>"
+    lead="Everything you need to know about ordering, pickup, delivery, and allergens, all in one place."
+  >
+    <nav aria-label="On this page" class="jump">
+      <ul role="list" class="chips">
+        {
+          sections.map((s) => (
+            <li>
+              <a class="chip" href={`#${s.id}`}>
+                {s.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </PageHero>
+
+  <section class="section-tight policy">
+    <div class="container-narrow prose">
+      <h2 id="ordering">Ordering</h2>
+      <ul>
+        <li>Every item is made to order.</li>
+        <li>
+          Please order at least {site.ordering.noticeHours} hours ahead. Chocolate covered strawberry boxes need 48
+          hours. Same-day orders are not available.
+        </li>
+        <li>Minimum quantities apply to most items and are listed on each menu page.</li>
+        <li>
+          Large or custom orders (about {site.ordering.largeOrderPieces} pieces or more) need a quick conversation with
+          us first. Send a catering inquiry and we will put together a quote.
+        </li>
+        <li>Your order is final once we confirm it with you.</li>
+      </ul>
+
+      <h2 id="pickup">Pickup</h2>
+      <p>
+        Pickup is in {site.location.city}, {site.location.region}. We share the pickup address and time when we confirm
+        your order.
+      </p>
+
+      <h2 id="delivery">Delivery</h2>
+      <p>
+        We offer limited delivery, scheduled around our baking calendar, within <strong
+          >{radiusMiles} miles of {site.location.city}, {site.location.region} {site.location.postalCode}</strong
+        >.
+      </p>
+      <div class="fee-table">
+        <table>
+          <caption class="visually-hidden">Delivery fees</caption>
+          <thead>
+            <tr>
+              <th scope="col">Order total</th>
+              <th scope="col">Delivery fee</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Up to ${flatFeeUpTo}</th>
+              <td>${flatFee} flat</td>
+            </tr>
+            <tr>
+              <th scope="row">Over ${flatFeeUpTo}</th>
+              <td>{percentOver}% of the order total</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted">The final delivery fee may vary with mileage.</p>
+
+      <h3>Delivery windows</h3>
+      <ul>
+        {
+          windows.map((w) => (
+            <li>
+              <strong>{w.label}:</strong> {w.time}
+            </li>
+          ))
+        }
+      </ul>
+      <p>Choose a window when you order.</p>
+
+      <h3>Delivery terms</h3>
+      <ul>
+        <li>Delivery is not guaranteed until we confirm it.</li>
+        <li>
+          If a delivery request falls outside what we can do, we may cancel the delivery and refund the delivery fee. You
+          can then switch to pickup or cancel the order.
+        </li>
+        <li>We cannot deliver beyond {radiusMiles} miles.</li>
+        <li>We decide whether a delivery is possible based on distance, scheduling, and order volume.</li>
+      </ul>
+
+      <h3>Areas we serve</h3>
+      <p>
+        {site.serviceAreaTowns.join(', ')}, and other nearby towns within {radiusMiles} miles. Not sure if you are in
+        range? Ask us before you order.
+      </p>
+
+      <h2 id="allergens">Allergens</h2>
+      <p>
+        Our kitchen handles <strong>wheat, dairy, eggs, soy, and tree nuts</strong>. Each menu item lists the allergens
+        it contains, but we cannot guarantee any item is free of cross-contact. If you have a severe allergy, please
+        message us before ordering.
+      </p>
+      <p>All of the cold cuts we serve are 100% halal-certified.</p>
+
+      <h2 id="storage">Storage &amp; freshness</h2>
+      <ul>
+        <li><strong>Refrigerate:</strong> mini cheesecakes, cake pops, date boxes, and chocolate covered strawberries.</li>
+        <li>
+          <strong>Room temperature:</strong> cookies, brownies, and cinnamon rolls (covered). Keep baklava at room
+          temperature and out of the fridge.
+        </li>
+        <li>Each menu page lists how long that item stays at its best.</li>
+      </ul>
+
+      <h2 id="changes">Changes</h2>
+      <p>
+        Need to change something? Message us as soon as you can and we will do our best to help. The sooner we hear
+        from you, the more we can do.
+      </p>
+
+      <p class="updated">Last updated {updated}.</p>
+
+      <div class="policy-cta">
+        <a class="btn" href="/order/">Start an order <Icon name="arrow" class="arrow" /></a>
+        <a class="btn btn-outline" href={site.links.whatsapp} target="_blank" rel="noopener">
+          <Icon name="chat" /> Ask a question
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .jump .chip {
+    text-decoration: none;
+  }
+  .jump .chip:hover {
+    border-color: var(--line-strong);
+    color: var(--ink);
+  }
+  .policy h2 {
+    scroll-margin-top: 110px;
+  }
+  .policy h2:first-child {
+    margin-top: 0;
+  }
+  .fee-table {
+    margin: 18px 0 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--paper);
+  }
+  .fee-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .fee-table th,
+  .fee-table td {
+    text-align: left;
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .fee-table tbody tr:last-child th,
+  .fee-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  .fee-table thead th {
+    background: var(--oat);
+    font-size: var(--step-tiny);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .fee-table tbody th {
+    font-weight: 650;
+    color: var(--ink);
+  }
+  .fee-table td {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--ink);
+  }
+  .updated {
+    margin-top: 40px;
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+  .policy-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+  }
+</style>

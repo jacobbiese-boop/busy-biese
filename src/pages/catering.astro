@@ -1,0 +1,329 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import ProductCard from '../components/ProductCard.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../config/site';
+import { products, productsIn, getProduct } from '../data/menu';
+import { money, each } from '../lib/format';
+import { breadcrumbJsonLd } from '../lib/seo';
+
+const savory = productsIn('sandwiches');
+const sliders = getProduct('cold-cut-slider-tray');
+const boutique = getProduct('cold-cut-boutique-box');
+const boutiqueTier = boutique?.tiers[0];
+
+// Largest size of each sweet item, pulled straight from the menu data.
+const dessertTrays = products
+  .filter((p) => ['pastries', 'cookies', 'cheesecakes', 'gift-boxes'].includes(p.category))
+  .map((p) => {
+    const counted = p.tiers.filter((t) => t.qty);
+    if (!counted.length) return null;
+    const top = counted.reduce((a, b) => ((b.qty ?? 0) > (a.qty ?? 0) ? b : a));
+    return { product: p, tier: top };
+  })
+  .filter((x): x is NonNullable<typeof x> => x !== null);
+
+const { radiusMiles, windows } = site.delivery;
+---
+
+<Base
+  title="Catering & Large Orders"
+  description={`Halal cold cut slider trays, boxed lunches, and dessert trays for meetings, parties, and community events in and around ${site.location.city}, IL. Delivery within ${radiusMiles} miles.`}
+  jsonLd={breadcrumbJsonLd(
+    [
+      { name: 'Home', path: '/' },
+      { name: 'Catering', path: '/catering/' },
+    ],
+    Astro.site,
+  )}
+>
+  <PageHero
+    eyebrow="Catering & large orders"
+    title="Feed the whole room, <em>beautifully</em>"
+    lead={`Halal cold cut slider trays and boxed lunches for meetings and events, plus dessert trays to round it out. Pickup in ${site.location.city} or delivery within ${radiusMiles} miles.`}
+  >
+    <div class="btn-row">
+      <a class="btn" href="/order/">Start a catering order <Icon name="arrow" class="arrow" /></a>
+      <a class="btn btn-outline" href={site.links.whatsapp} target="_blank" rel="noopener">
+        <Icon name="chat" /> Ask about a custom quote
+      </a>
+    </div>
+  </PageHero>
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Savory</p>
+        <h2>Sandwiches &amp; trays</h2>
+        <p>Every cold cut we serve is 100% halal-certified.</p>
+      </div>
+      <div class="grid grid-3">
+        {savory.map((p) => <ProductCard product={p} showCategory={false} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-dark">
+    <div class="container split">
+      <div>
+        <p class="eyebrow">Serving guide</p>
+        <h2>How many sliders do I need?</h2>
+        <p>Plan on about two sliders per person. Here is how our trays usually stretch.</p>
+        {
+          boutiqueTier && boutiqueTier.qty && (
+            <p>
+              For small teams, the Boutique Box brings {boutiqueTier.qty} full meals (sub, chips, and pickle) for{' '}
+              {money(boutiqueTier.price)}, which works out to {money(boutiqueTier.price / boutiqueTier.qty)} a person.
+            </p>
+          )
+        }
+      </div>
+      <div class="guide-card">
+        <table>
+          <caption class="visually-hidden">Slider tray serving guide</caption>
+          <thead>
+            <tr>
+              <th scope="col">Tray</th>
+              <th scope="col">Serves about</th>
+              <th scope="col">Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              sliders?.tiers.map((t) => (
+                <tr>
+                  <th scope="row">{t.label}</th>
+                  <td>{t.serves ?? ''}</td>
+                  <td>{money(t.price)}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+        {
+          sliders?.addOns && (
+            <p class="guide-foot">
+              Add-ons: {sliders.addOns.map((a) => `${a.label.toLowerCase()} ${money(a.price)}${a.note ? ' ' + a.note : ''}`).join(', ')}.
+            </p>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Sweet</p>
+        <h2>Dessert trays for a crowd</h2>
+        <p>Our largest sizes, made for events. Mix flavors where noted on each item.</p>
+      </div>
+      <ul class="trays" role="list">
+        {
+          dessertTrays.map(({ product, tier }) => (
+            <li data-reveal>
+              <a href={`/menu/${product.slug}/`}>
+                <span class="tray-name">{product.name}</span>
+                <span class="tray-size">{tier.label}</span>
+                <span class="tray-price">
+                  {money(tier.price)}
+                  {tier.qty && <small>{each(tier.price / tier.qty)} each</small>}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section-tight section-oat">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Planning tips</p>
+        <h2>For a smooth event</h2>
+      </div>
+      <div class="grid grid-4 tips">
+        <article>
+          <Icon name="calendar" size={28} stroke={1.4} />
+          <h3>Book early</h3>
+          <p>
+            We need {site.ordering.noticeHours} hours for most orders. For 48 sliders or more, a week ahead is best.
+          </p>
+        </article>
+        <article>
+          <Icon name="box" size={28} stroke={1.4} />
+          <h3>Going big?</h3>
+          <p>
+            For orders beyond our largest trays, or about {site.ordering.largeOrderPieces} pieces or more, we will put
+            together a custom quote.
+          </p>
+        </article>
+        <article>
+          <Icon name="truck" size={28} stroke={1.4} />
+          <h3>Delivery windows</h3>
+          <p>
+            We deliver within {radiusMiles} miles in two windows: {windows.map((w) => `${w.label.toLowerCase()} (${w.time})`).join(' and ')}.
+          </p>
+        </article>
+        <article>
+          <Icon name="check-badge" size={28} stroke={1.4} />
+          <h3>Halal, always</h3>
+          <p>All of our cold cuts are 100% halal-certified, so everyone at the table can dig in.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="cta-band">
+        <div>
+          <h2>Tell us about your event.</h2>
+          <p>Share your date, headcount, and what you have in mind. We will confirm the details and timing with you.</p>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-honey" href="/order/">Start an order <Icon name="arrow" class="arrow" /></a>
+          <a class="btn btn-ghost-dark" href={site.links.whatsapp} target="_blank" rel="noopener">Message us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .guide-card {
+    background: var(--espresso-2);
+    border: 1px solid rgba(246, 239, 229, 0.14);
+    border-radius: var(--radius-l);
+    padding: clamp(18px, 3vw, 30px);
+  }
+  .guide-card table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .guide-card th,
+  .guide-card td {
+    text-align: left;
+    padding: 14px 8px;
+    border-bottom: 1px solid rgba(246, 239, 229, 0.14);
+    color: var(--on-dark);
+  }
+  .guide-card thead th {
+    font-size: var(--step-tiny);
+    font-weight: 750;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--honey);
+  }
+  .guide-card tbody th {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 520;
+  }
+  .guide-card td:last-child {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+  }
+  .guide-foot {
+    margin: 16px 8px 0;
+    font-size: 0.92rem;
+  }
+
+  .trays {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  }
+  .trays a {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'name price'
+      'size price';
+    gap: 2px 16px;
+    align-items: center;
+    padding: 18px 20px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--ink);
+    transition:
+      border-color 0.2s var(--ease),
+      transform 0.2s var(--ease);
+  }
+  .trays a:hover {
+    border-color: rgba(138, 87, 16, 0.4);
+    transform: translateY(-2px);
+    color: var(--ink);
+  }
+  .tray-name {
+    grid-area: name;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 540;
+    line-height: 1.25;
+  }
+  .tray-size {
+    grid-area: size;
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .tray-price {
+    grid-area: price;
+    text-align: right;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 560;
+  }
+  .tray-price small {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .tips article {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px 22px 20px;
+  }
+  .tips :global(svg) {
+    color: var(--honey-deep);
+    margin-bottom: 14px;
+  }
+  .tips h3 {
+    font-size: 1.25rem;
+    margin-bottom: 6px;
+  }
+  .tips p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .cta-band {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px 40px;
+    padding: clamp(28px, 4vw, 48px);
+    border-radius: var(--radius-l);
+    background: var(--espresso);
+    color: var(--on-dark-muted);
+  }
+  .cta-band h2 {
+    color: var(--on-dark);
+    margin-bottom: 8px;
+  }
+  .cta-band p {
+    margin: 0;
+    max-width: 52ch;
+  }
+</style>

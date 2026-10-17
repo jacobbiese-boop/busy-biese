@@ -1,0 +1,202 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Photo from '../components/Photo.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../config/site';
+import { bakeryJsonLd, breadcrumbJsonLd } from '../lib/seo';
+
+const values = [
+  {
+    icon: 'heart',
+    title: 'Made with care',
+    text: 'Every recipe is made with care and intention, from the first batch to the final ribbon.',
+  },
+  {
+    icon: 'clock',
+    title: 'Small batches, made to order',
+    text: 'Nothing sits on a shelf. We bake for your order and your date, so it arrives fresh.',
+  },
+  {
+    icon: 'gift',
+    title: 'Meant to be shared',
+    text: 'Small gestures, a pastry, a coffee, a shared meal, create meaningful moments.',
+  },
+  {
+    icon: 'users',
+    title: 'Rooted in community',
+    text: 'Gathering around food strengthens community. That is the whole point of the hive.',
+  },
+];
+---
+
+<Base
+  title="Our Story"
+  description={`Busy Biese is a family, small-batch bakery in ${site.location.city}, IL, baking since ${site.established}. Biese is our family name, and yes, it sounds like "bees."`}
+  jsonLd={[
+    bakeryJsonLd(Astro.site),
+    breadcrumbJsonLd(
+      [
+        { name: 'Home', path: '/' },
+        { name: 'Our Story', path: '/about/' },
+      ],
+      Astro.site,
+    ),
+  ]}
+>
+  <PageHero
+    eyebrow="Our story"
+    title="A family name, <em>a full kitchen</em>"
+    lead={`Busy Biese is a small-batch bakery in ${site.location.city}, Illinois. Biese is our family name, and yes, it sounds like “bees.”`}
+  />
+
+  <section class="section-tight">
+    <div class="container split">
+      <div class="story prose">
+        <p class="big">
+          Busy Biese began in {site.established} with a belief we still bake by: food has the power to bring people
+          together.
+        </p>
+        <p>
+          Today we make everything to order in small batches, from brown butter cookies and cinnamon rolls to stuffed
+          date boxes for Ramadan and halal cold cut trays for the office. Each order is made with care and packed to be
+          given, shared, and enjoyed together.
+        </p>
+        <p>
+          The bee is our symbol for a reason. In a hive, every bee contributes to something greater than itself. We
+          try to run our kitchen the same way: thoughtful work, done with intention, for the people around us.
+        </p>
+      </div>
+      <div class="story-art" aria-hidden="true">
+        <div class="art-cell art-a hex">
+          <Photo names={['packaging', 'cookie-box']} alt="" icon="gift" sizes="(min-width: 900px) 30vw, 60vw" />
+        </div>
+        <div class="art-cell art-b hex">
+          <Photo names={['baklava-rose', 'dates-assorted-box']} alt="" icon="roll" sizes="(min-width: 900px) 22vw, 44vw" />
+        </div>
+        <div class="art-cell art-c hex"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-oat">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">What we believe</p>
+        <h2>The hive philosophy</h2>
+        <p>Four ideas behind every box that leaves our kitchen.</p>
+      </div>
+      <div class="grid grid-4">
+        {
+          values.map((v) => (
+            <article class="value" data-reveal>
+              <span class="value-icon">
+                <Icon name={v.icon} size={26} stroke={1.5} />
+              </span>
+              <h3>{v.title}</h3>
+              <p>{v.text}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container-narrow vision">
+      <p class="eyebrow">What's next</p>
+      <h2>Growing the hive</h2>
+      <p class="lead">
+        Our hope is to grow into a welcoming space of our own: a place where neighbors can gather, work, meet, and
+        celebrate over thoughtfully made food. For now, it starts with every order.
+      </p>
+      <div class="btn-row">
+        <a class="btn" href="/menu/">Explore the menu <Icon name="arrow" class="arrow" /></a>
+        <a class="btn btn-outline" href="/order/">Start an order</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .story .big {
+    font-family: var(--font-display);
+    font-size: var(--step-3);
+    line-height: 1.2;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+  }
+  .story p {
+    font-size: var(--step-1);
+  }
+
+  .story-art {
+    position: relative;
+    width: min(100%, 480px);
+    aspect-ratio: 1 / 1;
+    margin-inline: auto;
+  }
+  .art-cell {
+    position: absolute;
+    overflow: hidden;
+  }
+  .art-cell :global(.photo) {
+    height: 100%;
+  }
+  .art-a {
+    width: 64%;
+    left: 0;
+    top: 0;
+  }
+  .art-b {
+    width: 46%;
+    right: 0;
+    bottom: 0;
+  }
+  .art-c {
+    width: 18%;
+    right: 14%;
+    top: 8%;
+    background: var(--honey);
+  }
+
+  .value {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px 22px 20px;
+  }
+  .value-icon {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 60px;
+    margin-bottom: 16px;
+    background: var(--honey-soft);
+    color: var(--honey-deep);
+    -webkit-mask: var(--hex-mask) center / 100% 100% no-repeat;
+    mask: var(--hex-mask) center / 100% 100% no-repeat;
+  }
+  .value h3 {
+    font-size: 1.25rem;
+    margin-bottom: 6px;
+  }
+  .value p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .vision {
+    text-align: center;
+  }
+  .vision .eyebrow {
+    justify-content: center;
+  }
+  .vision .lead {
+    margin-bottom: 28px;
+  }
+  .vision .btn-row {
+    justify-content: center;
+  }
+</style>

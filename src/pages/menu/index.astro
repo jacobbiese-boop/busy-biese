@@ -1,0 +1,291 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import Icon from '../../components/Icon.astro';
+import PageHero from '../../components/PageHero.astro';
+import { categories, productsIn, products } from '../../data/menu';
+import { site } from '../../config/site';
+import { breadcrumbJsonLd } from '../../lib/seo';
+
+const ld = [
+  breadcrumbJsonLd(
+    [
+      { name: 'Home', path: '/' },
+      { name: 'Menu', path: '/menu/' },
+    ],
+    Astro.site,
+  ),
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Menu',
+    name: 'Busy Biese Menu',
+    hasMenuSection: categories.map((c) => ({
+      '@type': 'MenuSection',
+      name: c.name,
+      description: c.blurb,
+      hasMenuItem: productsIn(c.id).map((p) => ({
+        '@type': 'MenuItem',
+        name: p.name,
+        description: p.short,
+        url: new URL(`/menu/${p.slug}/`, Astro.site).href,
+      })),
+    })),
+  },
+];
+---
+
+<Base
+  title="Menu"
+  description={`The full Busy Biese menu: cinnamon rolls, mini cheesecakes, cookies, baklava, gift boxes, halal cold cut trays, and drinks. Made to order in ${site.location.city}, IL.`}
+  jsonLd={ld}
+>
+  <PageHero
+    eyebrow="The menu"
+    title="Everything we make, <em>made to order</em>"
+    lead={`${products.length} bakes, boxes, and trays, each made fresh for you. Prices and minimums are listed on every item, and quantity pricing gets better as you go up in size.`}
+  >
+    <ul class="facts" role="list">
+      <li><Icon name="clock" size={20} /> Order {site.ordering.noticeHours} hours ahead</li>
+      <li><Icon name="box" size={20} /> Minimums apply</li>
+      <li><Icon name="truck" size={20} /> Pickup or delivery within {site.delivery.radiusMiles} miles</li>
+    </ul>
+  </PageHero>
+
+  <nav class="cat-nav" aria-label="Menu categories" data-cat-nav>
+    <div class="container">
+      <ul role="list">
+        {
+          categories.map((c) => (
+            <li>
+              <a href={`#${c.id}`} data-cat-link={c.id}>
+                {c.name}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </nav>
+
+  <div class="menu-sections">
+    {
+      categories.map((c, i) => (
+        <section id={c.id} class:list={['menu-section', i % 2 === 1 && 'alt']} data-cat-section={c.id}>
+          <div class="container">
+            <header class="cat-head">
+              <span class="cat-badge">
+                <Icon name={c.icon} size={28} stroke={1.4} />
+              </span>
+              <div>
+                <h2>{c.name}</h2>
+                <p>{c.blurb}</p>
+                {c.note && <p class="cat-note">{c.note}</p>}
+              </div>
+            </header>
+            <div class="grid grid-3">
+              {productsIn(c.id).map((p) => (
+                <ProductCard product={p} showCategory={false} />
+              ))}
+            </div>
+          </div>
+        </section>
+      ))
+    }
+  </div>
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="menu-cta">
+        <div>
+          <h2>Ready when you are.</h2>
+          <p>
+            Send us your order at least {site.ordering.noticeHours} hours ahead. Planning for a big group? We put together
+            custom quotes for large orders.
+          </p>
+        </div>
+        <div class="btn-row">
+          <a class="btn" href="/order/">Start an order <Icon name="arrow" class="arrow" /></a>
+          <a class="btn btn-outline" href="/catering/">Catering &amp; large orders</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const links = document.querySelectorAll<HTMLAnchorElement>('[data-cat-link]');
+  const sections = document.querySelectorAll<HTMLElement>('[data-cat-section]');
+  const setActive = (id: string) => {
+    links.forEach((l) => {
+      const on = l.dataset.catLink === id;
+      l.classList.toggle('is-active', on);
+      if (on) {
+        l.setAttribute('aria-current', 'true');
+        const bar = l.closest('ul');
+        if (bar && bar.scrollWidth > bar.clientWidth) {
+          bar.scrollTo({ left: l.offsetLeft - 16, behavior: 'smooth' });
+        }
+      } else {
+        l.removeAttribute('aria-current');
+      }
+    });
+  };
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) setActive((e.target as HTMLElement).dataset.catSection || '');
+        });
+      },
+      { rootMargin: '-45% 0px -50% 0px' },
+    );
+    sections.forEach((s) => io.observe(s));
+  }
+</script>
+
+<style>
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    font-weight: 650;
+    font-size: 0.93rem;
+    color: var(--ink-2);
+  }
+  .facts li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .facts :global(svg) {
+    color: var(--honey-deep);
+  }
+
+  .cat-nav {
+    position: sticky;
+    top: 74px;
+    z-index: 40;
+    background: rgba(246, 239, 229, 0.94);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-block: 1px solid var(--line);
+  }
+  .cat-nav ul {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 12px 0;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, #000 92%, transparent);
+  }
+  .cat-nav ul::-webkit-scrollbar {
+    display: none;
+  }
+  .cat-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--ink-2);
+    white-space: nowrap;
+    transition:
+      background-color 0.2s var(--ease),
+      color 0.2s var(--ease),
+      border-color 0.2s var(--ease);
+  }
+  .cat-nav a:hover {
+    border-color: var(--line-strong);
+    color: var(--ink);
+  }
+  .cat-nav a.is-active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--cream);
+  }
+
+  .menu-section {
+    padding-block: clamp(48px, 6vw, 84px);
+    scroll-margin-top: 140px;
+  }
+  .menu-section.alt {
+    background: var(--paper);
+  }
+  .menu-section.alt :global(.pcard) {
+    background: var(--cream);
+  }
+  .cat-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: clamp(24px, 3vw, 36px);
+    max-width: 720px;
+  }
+  .cat-head h2 {
+    margin-bottom: 6px;
+  }
+  .cat-head p {
+    margin: 0;
+    color: var(--muted);
+  }
+  .cat-head .cat-note {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    font-weight: 650;
+    color: var(--honey-deep);
+  }
+  .cat-badge {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 67px;
+    background: var(--honey-soft);
+    color: var(--honey-deep);
+    -webkit-mask: var(--hex-mask) center / 100% 100% no-repeat;
+    mask: var(--hex-mask) center / 100% 100% no-repeat;
+  }
+
+  .menu-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px 40px;
+    padding: clamp(28px, 4vw, 48px);
+    border-radius: var(--radius-l);
+    background: var(--espresso);
+    color: var(--on-dark-muted);
+  }
+  .menu-cta h2 {
+    color: var(--on-dark);
+    margin-bottom: 8px;
+  }
+  .menu-cta p {
+    margin: 0;
+    max-width: 52ch;
+  }
+  .menu-cta .btn-outline {
+    --btn-fg: var(--on-dark);
+    --btn-border: rgba(246, 239, 229, 0.35);
+  }
+  .menu-cta .btn-outline:hover {
+    --btn-bg: var(--on-dark);
+    --btn-fg: var(--ink);
+  }
+  .menu-cta .btn:not(.btn-outline) {
+    --btn-bg: var(--honey);
+    --btn-fg: var(--ink);
+    --btn-border: var(--honey);
+  }
+  .menu-cta .btn:not(.btn-outline):hover {
+    --btn-bg: var(--cream);
+    --btn-border: var(--cream);
+  }
+</style>

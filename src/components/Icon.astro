@@ -1,0 +1,68 @@
+---
+/**
+ * Small line-icon set drawn for Busy Biese (24 x 24 grid, 1.6 stroke).
+ * Usage: <Icon name="cookie" />  Icons are decorative unless a label is passed.
+ */
+interface Props {
+  name: string;
+  size?: number;
+  label?: string;
+  class?: string;
+  stroke?: number;
+}
+
+const { name, size = 24, label, class: className, stroke = 1.6 } = Astro.props;
+
+const icons: Record<string, string> = {
+  roll: `<circle cx="12" cy="12" r="9"/><path d="M12 12a1.5 1.5 0 0 1 3 0a3 3 0 0 1-6 0a4.5 4.5 0 0 1 9 0a6 6 0 0 1-12 0"/>`,
+  cookie: `<circle cx="12" cy="12" r="9"/><circle cx="8.6" cy="9.2" r="1.15" fill="currentColor" stroke="none"/><circle cx="14.6" cy="8.2" r="1.15" fill="currentColor" stroke="none"/><circle cx="15.4" cy="14.2" r="1.15" fill="currentColor" stroke="none"/><circle cx="9.6" cy="15.4" r="1.15" fill="currentColor" stroke="none"/><circle cx="12.2" cy="11.8" r="0.9" fill="currentColor" stroke="none"/>`,
+  slice: `<path d="M3 16.5 20 9v7.5z"/><path d="M3 16.5h17v3H3z"/><circle cx="16.2" cy="8.6" r="1.6"/>`,
+  gift: `<rect x="4" y="10" width="16" height="10.5" rx="1.2"/><rect x="2.8" y="6.6" width="18.4" height="3.6" rx="1"/><path d="M12 6.6v13.9"/><path d="M12 6.6c-1.3-2.9-5-3.1-5-.9 0 1.2 2.3 1 5 .9zM12 6.6c1.3-2.9 5-3.1 5-.9 0 1.2-2.3 1-5 .9z"/>`,
+  sandwich: `<path d="M3.2 11.2C3.4 8.6 7.3 7 12 7s8.6 1.6 8.8 4.2z"/><path d="M3 13.6c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0"/><path d="M3.6 16.2h16.8c0 1.6-1.3 2.8-2.9 2.8h-11c-1.6 0-2.9-1.2-2.9-2.8z"/>`,
+  cup: `<path d="M5 9h11v4.8A5.2 5.2 0 0 1 10.8 19h-.6A5.2 5.2 0 0 1 5 13.8z"/><path d="M16 10.4h1.4a2.6 2.6 0 0 1 0 5.2H16"/><path d="M8.4 3.6c-.8 1 .8 2 0 3M12 3.6c-.8 1 .8 2 0 3"/><path d="M3.5 21.2h14"/>`,
+  arrow: `<path d="M4.5 12h15M13.5 6l6 6-6 6"/>`,
+  'arrow-left': `<path d="M19.5 12h-15M10.5 6l-6 6 6 6"/>`,
+  clock: `<circle cx="12" cy="12" r="9"/><path d="M12 7.2V12l3.2 2"/>`,
+  truck: `<path d="M2.8 6.5h11v9.5h-11z"/><path d="M13.8 9.5h4.1l3.3 3.4V16h-7.4"/><circle cx="7" cy="17.6" r="1.9"/><circle cx="17.4" cy="17.6" r="1.9"/>`,
+  calendar: `<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.8h17M8 3v4M16 3v4"/>`,
+  pin: `<path d="M12 21.2s-7-6.1-7-11.4a7 7 0 0 1 14 0c0 5.3-7 11.4-7 11.4z"/><circle cx="12" cy="9.8" r="2.5"/>`,
+  instagram: `<rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/>`,
+  chat: `<path d="M20.2 11.6a8.2 8.2 0 0 1-12.1 7.2l-4.3 1.2 1.2-4.1a8.2 8.2 0 1 1 15.2-4.3z"/><path d="M9 10.5h6M9 13.5h4"/>`,
+  mail: `<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/>`,
+  phone: `<path d="M6.6 3.5h2.6l1.3 4.1-1.9 1.3a11.4 11.4 0 0 0 6.5 6.5l1.3-1.9 4.1 1.3v2.6a2 2 0 0 1-2.2 2A16.6 16.6 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z"/>`,
+  check: `<path d="m5 12.5 4.5 4.5L19 7.5"/>`,
+  'check-badge': `<path d="M12 2.6 20.1 7.3v9.4L12 21.4l-8.1-4.7V7.3z"/><path d="m8.4 12.2 2.5 2.5 4.8-5"/>`,
+  sparkle: `<path d="M12 3.2 13.9 8.3 19 10.2 13.9 12.1 12 17.2 10.1 12.1 5 10.2 10.1 8.3z"/><path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>`,
+  heart: `<path d="M12 20.2S3.6 15.3 3.6 9.1A4.6 4.6 0 0 1 12 6.6a4.6 4.6 0 0 1 8.4 2.5c0 6.2-8.4 11.1-8.4 11.1z"/>`,
+  users: `<circle cx="9" cy="8.2" r="3.4"/><path d="M2.8 19.5c.6-3.3 3.1-5.3 6.2-5.3s5.6 2 6.2 5.3"/><path d="M15.6 5.1a3.3 3.3 0 0 1 0 6.3M17.6 14.6c1.9.6 3.2 2.3 3.6 4.9"/>`,
+  hex: `<path d="M12 2.6 20.1 7.3v9.4L12 21.4l-8.1-4.7V7.3z"/>`,
+  box: `<path d="M3.5 7.6 12 3.2l8.5 4.4v8.8L12 20.8l-8.5-4.4z"/><path d="M3.8 7.8 12 12l8.2-4.2M12 12v8.6"/>`,
+  menu: `<path d="M4 7.5h16M4 12h16M4 16.5h16"/>`,
+  close: `<path d="M6 6l12 12M18 6 6 18"/>`,
+  plus: `<path d="M12 5v14M5 12h14"/>`,
+  minus: `<path d="M5 12h14"/>`,
+  chevron: `<path d="m6.5 9.5 5.5 5.5 5.5-5.5"/>`,
+  external: `<path d="M14 4.5h5.5V10M19.5 4.5 11 13M18 14v4.2a1.8 1.8 0 0 1-1.8 1.8H5.8A1.8 1.8 0 0 1 4 18.2V7.8A1.8 1.8 0 0 1 5.8 6H10"/>`,
+  leaf: `<path d="M5 19c0-8 5-13.5 14.5-14-0.3 9.5-6 14.5-14 14.5z"/><path d="M5 19c3-3.5 6-6 9-8"/>`,
+  star: `<path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>`,
+};
+
+const markup = icons[name] ?? icons.hex;
+const a11y = label ? { role: 'img' as const, 'aria-label': label } : { 'aria-hidden': 'true' as const };
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width={stroke}
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class={className}
+  focusable="false"
+  {...a11y}
+  set:html={markup}
+/>

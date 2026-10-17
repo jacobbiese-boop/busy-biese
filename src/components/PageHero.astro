@@ -1,0 +1,109 @@
+---
+/**
+ * Top section for inner pages. `title` may include <em> for the italic accent.
+ */
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  crumbs?: { label: string; href?: string }[];
+  tone?: 'cream' | 'oat';
+}
+
+const { eyebrow, title, lead, crumbs, tone = 'cream' } = Astro.props;
+---
+
+<section class:list={['page-hero', `tone-${tone}`]}>
+  <div class="container">
+    {
+      crumbs && crumbs.length > 0 && (
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <ol role="list">
+            {crumbs.map((c, i) => (
+              <li>
+                {c.href && i < crumbs.length - 1 ? (
+                  <a href={c.href}>{c.label}</a>
+                ) : (
+                  <span aria-current="page">{c.label}</span>
+                )}
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h1 set:html={title} />
+    {lead && <p class="lead">{lead}</p>}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    position: relative;
+    padding: clamp(40px, 6vw, 84px) 0 clamp(36px, 5vw, 64px);
+    overflow: hidden;
+  }
+  .page-hero.tone-oat {
+    background: var(--oat);
+  }
+  .page-hero::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: min(46%, 560px);
+    height: 100%;
+    background-image: var(--comb);
+    background-size: 56px 97px;
+    -webkit-mask-image: radial-gradient(80% 90% at 85% 30%, #000 10%, transparent 72%);
+    mask-image: radial-gradient(80% 90% at 85% 30%, #000 10%, transparent 72%);
+    pointer-events: none;
+  }
+  .page-hero .container {
+    position: relative;
+    z-index: 1;
+  }
+  h1 {
+    font-size: var(--step-4);
+    max-width: 18ch;
+    margin-bottom: 18px;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+  }
+  h1 :global(em) {
+    color: var(--honey-deep);
+    font-weight: 440;
+  }
+  .lead {
+    max-width: 44rem;
+    margin-bottom: 26px;
+  }
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0 0 20px;
+    padding: 0;
+    list-style: none;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .crumbs li + li::before {
+    content: '/';
+    margin-right: 6px;
+    color: var(--line-strong);
+  }
+  .crumbs a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .crumbs a:hover {
+    color: var(--ink);
+  }
+  .crumbs [aria-current] {
+    color: var(--ink);
+  }
+</style>

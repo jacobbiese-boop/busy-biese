@@ -1,0 +1,166 @@
+---
+import type { Product } from '../data/menu';
+import { getCategory } from '../data/menu';
+import { priceLabel } from '../lib/format';
+import Photo from './Photo.astro';
+import Icon from './Icon.astro';
+
+interface Props {
+  product: Product;
+  showCategory?: boolean;
+  eager?: boolean;
+}
+
+const { product, showCategory = true, eager = false } = Astro.props;
+const category = getCategory(product.category);
+const href = `/menu/${product.slug}/`;
+const minShort = product.minimum?.replace(/\. .*$/, '');
+---
+
+<article class="pcard" data-reveal>
+  <div class="pcard-media">
+    <Photo names={product.photos} alt={product.name} icon={category.icon} ratio="4 / 3" eager={eager} />
+    {
+      product.badges && product.badges.length > 0 && (
+        <div class="pcard-badges">
+          {product.badges.map((b) => (
+            <span class:list={['badge', b === 'Halal' ? 'badge-dark' : 'badge-honey']}>{b}</span>
+          ))}
+        </div>
+      )
+    }
+  </div>
+  <div class="pcard-body">
+    {showCategory && <p class="pcard-cat">{category.name}</p>}
+    <h3 class="pcard-title">
+      <a href={href}>{product.name}</a>
+    </h3>
+    <p class="pcard-desc">{product.short}</p>
+    <div class="pcard-foot">
+      <div>
+        <span class="pcard-price">{priceLabel(product)}</span>
+        {minShort && <span class="pcard-min">{minShort}</span>}
+      </div>
+      <span class="pcard-go" aria-hidden="true"><Icon name="arrow" size={20} /></span>
+    </div>
+  </div>
+</article>
+
+<style>
+  .pcard {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition:
+      transform 0.3s var(--ease),
+      box-shadow 0.3s var(--ease),
+      border-color 0.3s var(--ease);
+  }
+  .pcard:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+    border-color: var(--line-strong);
+  }
+  .pcard:focus-within {
+    box-shadow: 0 0 0 3px var(--honey-soft);
+  }
+  .pcard-media {
+    position: relative;
+  }
+  .pcard-media :global(img) {
+    transition: transform 0.7s var(--ease);
+  }
+  .pcard:hover .pcard-media :global(img) {
+    transform: scale(1.04);
+  }
+  .pcard-badges {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .pcard-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 18px 20px 20px;
+  }
+  .pcard-cat {
+    font-size: var(--step-tiny);
+    font-weight: 750;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--honey-deep);
+    margin: 0 0 8px;
+  }
+  .pcard-title {
+    font-size: 1.32rem;
+    line-height: 1.18;
+    margin: 0 0 8px;
+  }
+  .pcard-title a {
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .pcard-title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .pcard-title a:focus-visible {
+    outline: none;
+  }
+  .pcard-desc {
+    color: var(--muted);
+    font-size: 0.94rem;
+    line-height: 1.55;
+    margin: 0 0 18px;
+  }
+  .pcard-foot {
+    margin-top: auto;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--line-strong);
+  }
+  .pcard-price {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.28rem;
+    font-weight: 560;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .pcard-min {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .pcard-go {
+    display: inline-grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    background: var(--honey-wash);
+    color: var(--ink);
+    flex: none;
+    transition:
+      background-color 0.25s var(--ease),
+      transform 0.25s var(--ease);
+  }
+  .pcard:hover .pcard-go {
+    background: var(--honey);
+    transform: translateX(3px);
+  }
+</style>

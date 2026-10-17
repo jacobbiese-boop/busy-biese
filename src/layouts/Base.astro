@@ -1,0 +1,155 @@
+---
+import '@fontsource-variable/fraunces/standard.css';
+import '@fontsource-variable/fraunces/standard-italic.css';
+import '@fontsource-variable/manrope/wght.css';
+import '../styles/global.css';
+
+import frauncesUrl from '@fontsource-variable/fraunces/files/fraunces-latin-standard-normal.woff2?url';
+import manropeUrl from '@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2?url';
+
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../config/site';
+
+interface Props {
+  /** Page name, e.g. "Cinnamon Rolls". Leave empty on the home page. */
+  title?: string;
+  description?: string;
+  /** Social share image path, e.g. /photos/cinnamon-rolls-og.jpg */
+  image?: string;
+  imageAlt?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  ogType?: 'website' | 'product' | 'article';
+}
+
+const {
+  title,
+  description = site.description,
+  image = '/og/busy-biese.png',
+  imageAlt = 'Busy Biese, a small-batch bakery in Glendale Heights, IL',
+  noindex = false,
+  jsonLd,
+  ogType = 'website',
+} = Astro.props;
+
+const fullTitle = title ? `${title} | Busy Biese` : site.titleSuffix;
+const siteUrl = Astro.site ?? new URL('https://busybiese.com');
+const canonical = new URL(Astro.url.pathname, siteUrl).href;
+const imageUrl = new URL(image, siteUrl).href;
+const ldBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+const ga4 = site.analytics.ga4;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#F6EFE5" />
+
+    <link rel="preload" href={frauncesUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={manropeUrl} as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:site_name" content="Busy Biese" />
+    <meta property="og:type" content={ogType === 'product' ? 'product' : 'website'} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+
+    {ldBlocks.map((block) => <script type="application/ld+json" set:html={JSON.stringify(block)} />)}
+
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+
+    {
+      ga4 && (
+        <>
+          <script async src={`https://www.googletagmanager.com/gtag/js?id=${ga4}`} />
+          <script is:inline define:vars={{ ga4 }}>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+              dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+            gtag('config', ga4);
+          </script>
+        </>
+      )
+    }
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      // Header shadow once the page scrolls
+      const header = document.querySelector<HTMLElement>('[data-header]');
+      const onScroll = () => header?.classList.toggle('is-scrolled', window.scrollY > 8);
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      // Mobile menu
+      const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+      const panel = document.querySelector<HTMLElement>('[data-mobile-menu]');
+      const label = toggle?.querySelector('.visually-hidden');
+      const setOpen = (open: boolean) => {
+        if (!toggle || !panel) return;
+        toggle.setAttribute('aria-expanded', String(open));
+        panel.hidden = !open;
+        if (label) label.textContent = open ? 'Close menu' : 'Open menu';
+        document.body.style.overflow = open ? 'hidden' : '';
+      };
+      toggle?.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+      panel?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && toggle?.getAttribute('aria-expanded') === 'true') {
+          setOpen(false);
+          toggle.focus();
+        }
+      });
+      window.matchMedia('(min-width: 900px)').addEventListener('change', (e) => {
+        if (e.matches) setOpen(false);
+      });
+
+      // Gentle reveal on scroll
+      const items = document.querySelectorAll<HTMLElement>('[data-reveal]');
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                io.unobserve(entry.target);
+              }
+            });
+          },
+          { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
+        );
+        items.forEach((el) => io.observe(el));
+      } else {
+        items.forEach((el) => el.classList.add('is-visible'));
+      }
+    </script>
+  </body>
+</html>

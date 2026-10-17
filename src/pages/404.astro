@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+---
+
+<Base title="Page not found" description="We could not find that page." noindex>
+  <section class="nf">
+    <div class="container-narrow">
+      <p class="eyebrow">Error 404</p>
+      <h1>We couldn’t find that page.</h1>
+      <p class="lead">It may have moved when we refreshed the site. Try one of these instead.</p>
+      <div class="btn-row">
+        <a class="btn" href="/menu/">See the menu <Icon name="arrow" class="arrow" /></a>
+        <a class="btn btn-outline" href="/order/">Start an order</a>
+        <a class="btn btn-outline" href="/">Home</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    padding: clamp(64px, 12vw, 160px) 0;
+    text-align: center;
+    background-image: var(--comb);
+    background-size: 56px 97px;
+  }
+  .nf .container-narrow {
+    background: var(--cream);
+    border-radius: var(--radius-l);
+    padding: clamp(28px, 5vw, 56px);
+    border: 1px solid var(--line);
+  }
+  .nf .eyebrow {
+    justify-content: center;
+  }
+  .nf .btn-row {
+    justify-content: center;
+    margin-top: 10px;
+  }
+</style>
