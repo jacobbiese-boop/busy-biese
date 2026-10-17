@@ -9,6 +9,12 @@ Run `python3 scripts/import_photos.py --file photo.HEIC --name some-name` to add
 (see the top of that script). Until a photo exists, the site shows a dusty pink panel with
 a small bee, so nothing breaks.
 
+The current set came from the shared Google Drive folder through the
+"Import photos from Google Drive" workflow (Actions tab, Run workflow). It reads the Drive
+file IDs from the `DRIVE_PHOTO_IDS` repository secret, rebuilds every file listed below,
+checks each one against the reviewed version (size and a visual fingerprint) and commits
+the result. If a check fails, nothing is committed. See `scripts/photos_from_drive.py`.
+
 Photos are shown without captions. The `alt` text in `gallery` (src/data/menu.ts) is read
 only by screen readers and search engines.
 

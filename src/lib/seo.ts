@@ -23,7 +23,7 @@ export function bakeryJsonLd(base: URL | undefined) {
     url: abs('/', base),
     description: site.description,
     logo: abs('/brand/mark-512.png', base),
-    image: abs('/og/busy-biese.png', base),
+    image: abs('/og/busy-biese.png?v=2', base),
     slogan: site.tagline,
     foundingDate: String(site.established),
     priceRange: '$$',
@@ -63,7 +63,7 @@ export function productJsonLd(product: Product, base: URL | undefined) {
     description: product.description,
     category: getCategory(product.category).name,
     url,
-    ...(photos.length ? { image: photos } : { image: [abs('/og/busy-biese.png', base)] }),
+    ...(photos.length ? { image: photos } : { image: [abs('/og/busy-biese.png?v=2', base)] }),
     brand: { '@type': 'Brand', name: site.name },
     offers: {
       '@type': 'AggregateOffer',

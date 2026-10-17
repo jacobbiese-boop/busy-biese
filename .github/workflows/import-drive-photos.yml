@@ -1,0 +1,45 @@
+# Imports the bakery photos from Google Drive into public/photos.
+# Run it by hand from the Actions tab ("Run workflow").
+# Needs the DRIVE_PHOTO_IDS repository secret (see scripts/photos_from_drive.py).
+name: Import photos from Google Drive
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: import-drive-photos
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install image tools
+        run: pip install Pillow==12.3.0 pillow-heif==1.8.1
+
+      - name: Download, convert and check the photos
+        env:
+          DRIVE_PHOTO_IDS: ${{ secrets.DRIVE_PHOTO_IDS }}
+        run: python scripts/photos_from_drive.py public/photos
+
+      - name: Commit the photos
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/photos
+          if git diff --cached --quiet; then
+            echo "Photos are already up to date."
+            exit 0
+          fi
+          git commit -m "Add bakery photos from Google Drive"
+          git push
