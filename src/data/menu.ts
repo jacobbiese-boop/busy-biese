@@ -3,7 +3,7 @@
  *
  * Every product, price, and detail on the site comes from this file.
  * To change a price, edit the `tiers` for that product and redeploy.
- * Photos are matched by the names in `photos` (see public/photos/README.md).
+ * Photos are matched by the names in `photos` (see docs/PHOTOS.md).
  */
 
 export type CategoryId =
@@ -155,7 +155,7 @@ export const products: Product[] = [
         a: 'For 32 rolls or more, send a catering inquiry and we will put together custom pricing and timing.',
       },
     ],
-    photos: ['cinnamon-rolls'],
+    photos: ['cinnamon-rolls', 'cinnamon-rolls-trays'],
   },
   {
     slug: 'house-baklava',
@@ -190,7 +190,7 @@ export const products: Product[] = [
         a: 'Our syrup is lighter than most, with citrus and floral notes that keep it balanced.',
       },
     ],
-    photos: ['baklava-rose', 'baklava-variety'],
+    photos: ['baklava-rose'],
   },
 
   // Cookies & Brownies
@@ -230,7 +230,7 @@ export const products: Product[] = [
       },
       { q: 'Can they be frozen?', a: 'Yes, in an airtight container for up to 2 months.' },
     ],
-    photos: ['cookie-brown-butter', 'cookie-box', 'packaging'],
+    photos: ['cookie-brown-butter'],
   },
   {
     slug: 'smores-chocolate-chunk-cookies',
@@ -263,7 +263,7 @@ export const products: Product[] = [
         a: 'Yes. Mix them with Brown Butter Chocolate Chip cookies in the same order.',
       },
     ],
-    photos: ['cookie-smores', 'smores-batch', 'cookie-box'],
+    photos: ['cookie-smores', 'smores-batch'],
   },
   {
     slug: 'nutella-brownies',
@@ -298,7 +298,7 @@ export const products: Product[] = [
         a: 'They are rich and fudgy rather than sugary. The dark chocolate keeps the Nutella in check.',
       },
     ],
-    photos: ['brownies-nutella', 'packaging'],
+    photos: ['brownies-nutella'],
   },
 
   // Cheesecakes & Cake Pops
@@ -322,7 +322,7 @@ export const products: Product[] = [
       { label: '12 pack', qty: 12, price: 64 },
       { label: '24 pack', qty: 24, price: 120 },
     ],
-    minimum: 'Minimum 3',
+    minimum: 'Minimum 3 cheesecakes',
     flavors: ['Classic Strawberry', 'Biscoff', 'Oreo'],
     notes: ['Ordering 48 or more? Request a catering quote.'],
     leadTime: '72 hours',
@@ -338,7 +338,7 @@ export const products: Product[] = [
         a: 'We need 72 hours notice for every order, so same-day orders are not available.',
       },
     ],
-    photos: ['cheesecake-strawberry', 'cheesecake-oreo', 'cheesecake-biscoff', 'packaging'],
+    photos: ['cheesecake-oreo', 'cheesecake-strawberry', 'cheesecake-biscoff'],
   },
   {
     slug: 'cake-pops',
@@ -357,7 +357,7 @@ export const products: Product[] = [
       { label: '24 cake pops', qty: 24, price: 66 },
       { label: '48 cake pops', qty: 48, price: 120 },
     ],
-    minimum: 'Minimum 12',
+    minimum: 'Minimum 12 cake pops',
     flavors: ['Chocolate', 'Vanilla'],
     addOns: [{ label: 'Custom color matching', price: 10, note: 'per order' }],
     leadTime: '72 hours',
@@ -376,7 +376,7 @@ export const products: Product[] = [
         a: 'Chocolate or vanilla cake, both dipped in white chocolate with gold leaf.',
       },
     ],
-    photos: ['cake-pops', 'packaging'],
+    photos: ['cake-pops'],
   },
 
   // Gift Boxes
@@ -406,7 +406,7 @@ export const products: Product[] = [
       },
       { q: 'Is it ready to gift?', a: 'Yes. It comes boxed, ribboned, and ready to give.' },
     ],
-    photos: ['dates-assorted-box', 'dates-small-box'],
+    photos: ['dates-assorted-box'],
   },
   {
     slug: 'small-date-boxes',
@@ -434,7 +434,7 @@ export const products: Product[] = [
         a: 'Note your preferences on the order form and we will do our best to match them.',
       },
     ],
-    photos: ['dates-small-box-single', 'dates-small-box'],
+    photos: ['dates-small-box'],
   },
   {
     slug: 'chocolate-covered-strawberry-box',
@@ -467,7 +467,7 @@ export const products: Product[] = [
       },
       { q: 'Are they available year-round?', a: 'Yes, though berry size can vary with the season.' },
     ],
-    photos: ['strawberry-box', 'packaging'],
+    photos: ['strawberry-box'],
   },
 
   // Sandwiches & Trays
@@ -662,16 +662,30 @@ export const products: Product[] = [
   },
 ];
 
-/** Photos for the "From our kitchen" strip on the home page. */
-export const kitchenGallery: { photo: string; label: string }[] = [
-  { photo: 'smores-batch', label: "S'mores cookies" },
-  { photo: 'cheese-danishes', label: 'Cheese danishes' },
-  { photo: 'cheesecake-oreo', label: 'Oreo cheesecake' },
-  { photo: 'cheesecake-biscoff', label: 'Biscoff cheesecake' },
-  { photo: 'pumpkin-muffins', label: 'Pumpkin muffins' },
-  { photo: 'cookie-brown-butter', label: 'Brown butter cookies' },
-  { photo: 'matcha-cookies', label: 'Matcha cookies' },
-  { photo: 'apple-pie', label: 'Apple pie' },
+/**
+ * The photo gallery: real pictures of things we have made, shown without
+ * captions. `alt` is read by screen readers and search engines only.
+ * Order matters: the first few appear on the home page.
+ */
+export const gallery: { photo: string; alt: string }[] = [
+  { photo: 'cinnamon-rolls', alt: 'A pan of cinnamon rolls with cream cheese frosting' },
+  { photo: 'cookie-smores', alt: "A s'mores chocolate chunk cookie with a toasted marshmallow center" },
+  { photo: 'baklava-rose', alt: 'A tray of baklava topped with pistachio and rose petals' },
+  { photo: 'cake-new-chapter', alt: 'A white buttercream cake with ribbon bows and a New Chapter Begins topper' },
+  { photo: 'dessert-box', alt: 'A box of mini dessert cups: mango, strawberry and rose cream' },
+  { photo: 'cookie-brown-butter', alt: 'Brown butter chocolate chip cookies cooling on a rack' },
+  { photo: 'dates-small-box', alt: 'Small gift boxes of chocolate covered dates tied with gold cord' },
+  { photo: 'muffins', alt: 'Cream cheese filled muffins in black tulip liners' },
+  { photo: 'catering-trays', alt: 'Two catering trays of piped cream dessert with pistachio and rose petals' },
+  { photo: 'cake-bride', alt: 'A Bride to Be cake with pink buttercream roses, boxed' },
+  { photo: 'market-table', alt: 'A market table of packaged cheesecakes, brownies and cookies' },
+  { photo: 'smores-batch', alt: "A batch of s'mores cookies on a cooling rack" },
+  { photo: 'cinnamon-rolls-trays', alt: 'Three trays of freshly baked cinnamon rolls' },
+  { photo: 'muffins-window', alt: 'Muffins cooling by a sunny window' },
+  { photo: 'cake-bride-table', alt: 'A Bride to Be cake on a party table' },
+  { photo: 'cake-new-chapter-2', alt: 'A celebration cake with a New Chapter Begins topper' },
+  { photo: 'dessert-jars', alt: 'Dessert jars with a swirl of pink frosting and sprinkles' },
+  { photo: 'market-table-sign', alt: 'The Busy Biese table at a market, with the menu sign' },
 ];
 
 export function getCategory(id: CategoryId): Category {

@@ -11,7 +11,6 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   site.announcement && (
     <aside class="announce" aria-label="Announcement">
       <div class="container announce-inner">
-        <Icon name="clock" size={16} />
         <span>{site.announcement}</span>
       </div>
     </aside>
@@ -20,8 +19,8 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 
 <header class="site-header" data-header>
   <div class="container header-inner">
-    <a href="/" class="brand" aria-label="Busy Biese, home">
-      <Logo size={34} />
+    <a href="/" class="brand">
+      <Logo size="nav" label="Busy Biese, home" />
     </a>
 
     <nav class="desktop-nav" aria-label="Main">
@@ -39,9 +38,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     </nav>
 
     <div class="header-actions">
-      <a href="/order/" class="btn btn-small order-btn">
-        Order <Icon name="arrow" class="arrow" />
-      </a>
+      <a href="/order/" class="btn btn-small order-btn">Order</a>
       <button
         class="menu-toggle"
         type="button"
@@ -50,8 +47,8 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
         data-menu-toggle
       >
         <span class="visually-hidden">Open menu</span>
-        <Icon name="menu" class="icon-open" />
-        <Icon name="close" class="icon-close" />
+        <Icon name="menu" class="icon-open" stroke={1.5} />
+        <Icon name="close" class="icon-close" stroke={1.5} />
       </button>
     </div>
   </div>
@@ -72,13 +69,13 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
           }
         </ul>
       </nav>
-      <a href="/order/" class="btn mobile-order">Start an order <Icon name="arrow" class="arrow" /></a>
+      <a href="/order/" class="btn mobile-order">Order now</a>
       <div class="mobile-social">
         <a href={site.links.instagram} target="_blank" rel="noopener">
-          <Icon name="instagram" size={20} /> Instagram
+          <Icon name="instagram" size={18} stroke={1.5} /> Instagram
         </a>
         <a href={site.links.whatsapp} target="_blank" rel="noopener">
-          <Icon name="chat" size={20} /> WhatsApp
+          <Icon name="chat" size={18} stroke={1.5} /> WhatsApp
         </a>
       </div>
     </div>
@@ -87,41 +84,32 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 
 <style>
   .announce {
-    background: var(--espresso);
-    color: var(--on-dark);
-    font-size: 0.82rem;
-    font-weight: 600;
-    letter-spacing: 0.01em;
+    background: var(--pink-matte);
+    color: var(--cocoa);
+    font-size: var(--step-micro);
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
   }
   .announce-inner {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    min-height: 38px;
+    min-height: 34px;
     text-align: center;
-    padding-block: 6px;
-  }
-  .announce :global(svg) {
-    color: var(--honey);
-    flex: none;
+    padding-block: 7px;
   }
 
   .site-header {
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(246, 239, 229, 0.9);
-    -webkit-backdrop-filter: saturate(1.4) blur(12px);
-    backdrop-filter: saturate(1.4) blur(12px);
-    border-bottom: 1px solid transparent;
-    transition:
-      border-color 0.25s var(--ease),
-      box-shadow 0.25s var(--ease);
+    background: var(--ivory);
+    border-bottom: 1px solid var(--border);
+    transition: box-shadow 0.25s var(--ease);
   }
   .site-header.is-scrolled {
-    border-bottom-color: var(--line);
-    box-shadow: 0 6px 24px -18px rgba(35, 26, 21, 0.45);
+    box-shadow: 0 8px 24px -20px rgba(92, 58, 51, 0.5);
   }
 
   .header-inner {
@@ -129,16 +117,18 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    height: 74px;
+    height: 70px;
   }
 
   .brand {
     text-decoration: none;
-    color: var(--ink);
+    color: var(--cocoa);
     display: inline-flex;
+    border-radius: 4px;
   }
-  .brand :global(.logo-word) {
-    font-size: 1.42rem;
+  .brand:hover {
+    text-decoration: none;
+    color: var(--cocoa);
   }
 
   .desktop-nav {
@@ -153,23 +143,33 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     display: inline-flex;
     align-items: center;
     height: 40px;
-    padding: 0 14px;
-    border-radius: 999px;
-    font-weight: 650;
-    font-size: 0.95rem;
+    padding: 0 12px;
+    font-size: var(--step-micro);
+    font-weight: 400;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
     text-decoration: none;
-    color: var(--ink-2);
-    transition:
-      background-color 0.2s var(--ease),
-      color 0.2s var(--ease);
+    color: var(--cocoa);
+  }
+  .desktop-nav a::after {
+    content: '';
+    position: absolute;
+    left: 12px;
+    right: calc(12px + 0.4em);
+    bottom: 8px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s var(--ease);
   }
   .desktop-nav a:hover {
-    background: var(--oat);
-    color: var(--ink);
+    text-decoration: none;
+    color: var(--rose-text);
   }
-  .desktop-nav a[aria-current='page'] {
-    color: var(--ink);
-    background: var(--honey-wash);
+  .desktop-nav a:hover::after,
+  .desktop-nav a[aria-current='page']::after {
+    transform: scaleX(1);
   }
 
   .header-actions {
@@ -181,12 +181,13 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   .menu-toggle {
     display: inline-grid;
     place-items: center;
-    width: 46px;
-    height: 46px;
+    width: 44px;
+    height: 44px;
     border-radius: 999px;
-    border: 1px solid var(--line-strong);
+    border: 0;
     background: transparent;
     cursor: pointer;
+    color: var(--cocoa);
   }
   .menu-toggle :global(.icon-close) {
     display: none;
@@ -199,28 +200,28 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   }
 
   .mobile-menu {
-    border-top: 1px solid var(--line);
-    background: var(--cream);
-    padding: 12px 0 28px;
-    min-height: calc(100dvh - 74px);
-    max-height: calc(100dvh - 74px);
+    border-top: 1px solid var(--border);
+    background: var(--ivory);
+    padding: 8px 0 28px;
+    min-height: calc(100dvh - 70px);
+    max-height: calc(100dvh - 70px);
     overflow-y: auto;
   }
   .mobile-links li {
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--border);
   }
   .mobile-links a {
     display: flex;
     align-items: center;
     min-height: 58px;
     font-family: var(--font-display);
-    font-size: 1.55rem;
+    font-size: 1.6rem;
     font-weight: 500;
     text-decoration: none;
-    color: var(--ink);
+    color: var(--cocoa);
   }
   .mobile-links a[aria-current='page'] {
-    color: var(--honey-deep);
+    color: var(--rose-text);
   }
   .mobile-order {
     width: 100%;
@@ -229,23 +230,26 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   .mobile-social {
     display: flex;
     gap: 22px;
-    margin-top: 20px;
+    margin-top: 22px;
   }
   .mobile-social a {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-weight: 650;
+    font-size: var(--step-micro);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
     text-decoration: none;
-    color: var(--ink-2);
+    color: var(--cocoa);
   }
 
-  @media (max-width: 380px) {
-    .brand :global(.logo-word) {
-      font-size: 1.22rem;
+  @media (max-width: 480px) {
+    .announce {
+      letter-spacing: 0.1em;
+      font-size: 0.625rem;
     }
     .order-btn {
-      padding: 0 14px;
+      padding: 10px 14px;
     }
   }
 

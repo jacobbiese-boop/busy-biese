@@ -1,7 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
-import Icon from '../components/Icon.astro';
 import { site } from '../config/site';
 import { breadcrumbJsonLd } from '../lib/seo';
 
@@ -32,6 +31,7 @@ const sections = [
     eyebrow="Policies"
     title="Delivery &amp; <em>order policy</em>"
     lead="Everything you need to know about ordering, pickup, delivery, and allergens, all in one place."
+    tone="pink"
   >
     <nav aria-label="On this page" class="jump">
       <ul role="list" class="chips">
@@ -156,22 +156,28 @@ const sections = [
       <p class="updated">Last updated {updated}.</p>
 
       <div class="policy-cta">
-        <a class="btn" href="/order/">Start an order <Icon name="arrow" class="arrow" /></a>
-        <a class="btn btn-outline" href={site.links.whatsapp} target="_blank" rel="noopener">
-          <Icon name="chat" /> Ask a question
-        </a>
+        <a class="btn" href="/order/">Start an order</a>
+        <a class="btn btn-outline" href={site.links.whatsapp} target="_blank" rel="noopener">Ask a question</a>
       </div>
     </div>
   </section>
 </Base>
 
 <style>
+  .jump {
+    margin-top: 6px;
+  }
   .jump .chip {
     text-decoration: none;
+    background: var(--ivory);
+    border-color: transparent;
+    font-size: var(--step-micro);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
   }
   .jump .chip:hover {
-    border-color: var(--line-strong);
-    color: var(--ink);
+    background: var(--white);
+    text-decoration: none;
   }
   .policy h2 {
     scroll-margin-top: 110px;
@@ -179,12 +185,16 @@ const sections = [
   .policy h2:first-child {
     margin-top: 0;
   }
+  .policy p,
+  .policy li {
+    font-size: var(--step-body-small);
+  }
   .fee-table {
     margin: 18px 0 10px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
     overflow: hidden;
-    background: var(--paper);
+    background: var(--white);
   }
   .fee-table table {
     width: 100%;
@@ -193,33 +203,32 @@ const sections = [
   .fee-table th,
   .fee-table td {
     text-align: left;
-    padding: 13px 18px;
-    border-bottom: 1px solid var(--line);
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
   }
   .fee-table tbody tr:last-child th,
   .fee-table tbody tr:last-child td {
     border-bottom: 0;
   }
   .fee-table thead th {
-    background: var(--oat);
-    font-size: var(--step-tiny);
-    letter-spacing: 0.12em;
+    background: var(--pink);
+    font-size: var(--step-micro);
+    font-weight: 400;
+    letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: var(--muted);
   }
   .fee-table tbody th {
-    font-weight: 650;
-    color: var(--ink);
+    font-weight: 400;
   }
   .fee-table td {
     font-family: var(--font-display);
-    font-size: 1.1rem;
-    color: var(--ink);
+    font-size: 1.15rem;
+    font-weight: 600;
   }
   .updated {
     margin-top: 40px;
-    font-size: 0.88rem;
-    color: var(--muted);
+    font-size: var(--step-small) !important;
+    color: var(--mauve);
   }
   .policy-cta {
     display: flex;

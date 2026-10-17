@@ -1,16 +1,15 @@
 ---
 /**
  * Shows the first available photo from `names`. If none exist yet, shows a
- * designed honeycomb placeholder with a category icon, so layouts never break.
+ * dusty pink panel with a small rose bee, so layouts never break.
  */
 import { photoSrcset, photoUrl, firstPhoto } from '../lib/photos';
-import Icon from './Icon.astro';
+import Bee from './Bee.astro';
 
 interface Props {
   names?: string[];
   name?: string;
   alt: string;
-  icon?: string;
   sizes?: string;
   ratio?: string;
   eager?: boolean;
@@ -21,7 +20,6 @@ const {
   names,
   name,
   alt,
-  icon = 'hex',
   sizes = '(min-width: 1100px) 380px, (min-width: 700px) 45vw, 100vw',
   ratio,
   eager = false,
@@ -47,8 +45,8 @@ const chosen = firstPhoto(list);
         fetchpriority={eager ? 'high' : 'auto'}
       />
     ) : (
-      <div class="ph" aria-hidden="true">
-        <Icon name={icon} stroke={1.3} />
+      <div class="ph">
+        <Bee size={56} color="var(--rose)" />
       </div>
     )
   }
@@ -58,7 +56,7 @@ const chosen = firstPhoto(list);
   .photo {
     position: relative;
     overflow: hidden;
-    background: var(--oat);
+    background: var(--pink);
     width: 100%;
   }
   .photo img,

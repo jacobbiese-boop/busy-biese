@@ -6,7 +6,7 @@ import { site } from '../config/site';
 import type { Product } from '../data/menu';
 import { getCategory } from '../data/menu';
 import { highestPrice, startingPrice } from './format';
-import { availablePhotos } from './photos';
+import { availablePhotos, photoUrl } from './photos';
 
 const fallback = new URL('https://busybiese.com');
 
@@ -52,7 +52,7 @@ export function bakeryJsonLd(base: URL | undefined) {
 }
 
 export function productJsonLd(product: Product, base: URL | undefined) {
-  const photos = availablePhotos(product.photos).map((p) => abs(`/photos/${p}-1600.webp`, base));
+  const photos = availablePhotos(product.photos).map((p) => abs(photoUrl(p, 1400), base));
   const url = abs(`/menu/${product.slug}/`, base);
   const low = startingPrice(product);
   const high = highestPrice(product);

@@ -1,109 +1,100 @@
 ---
 /**
- * Top section for inner pages. `title` may include <em> for the italic accent.
+ * Top section for inner pages. `title` may include <em> for an italic accent.
+ * tone "pink" puts the heading on a dusty pink panel; "ivory" leaves it on the page.
  */
 interface Props {
   eyebrow?: string;
   title: string;
   lead?: string;
   crumbs?: { label: string; href?: string }[];
-  tone?: 'cream' | 'oat';
+  tone?: 'ivory' | 'pink';
 }
 
-const { eyebrow, title, lead, crumbs, tone = 'cream' } = Astro.props;
+const { eyebrow, title, lead, crumbs, tone = 'ivory' } = Astro.props;
 ---
 
 <section class:list={['page-hero', `tone-${tone}`]}>
   <div class="container">
-    {
-      crumbs && crumbs.length > 0 && (
-        <nav class="crumbs" aria-label="Breadcrumb">
-          <ol role="list">
-            {crumbs.map((c, i) => (
-              <li>
-                {c.href && i < crumbs.length - 1 ? (
-                  <a href={c.href}>{c.label}</a>
-                ) : (
-                  <span aria-current="page">{c.label}</span>
-                )}
-              </li>
-            ))}
-          </ol>
-        </nav>
-      )
-    }
-    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
-    <h1 set:html={title} />
-    {lead && <p class="lead">{lead}</p>}
-    <slot />
+    <div class="hero-inner">
+      {
+        crumbs && crumbs.length > 0 && (
+          <nav class="crumbs" aria-label="Breadcrumb">
+            <ol role="list">
+              {crumbs.map((c, i) => (
+                <li>
+                  {c.href && i < crumbs.length - 1 ? (
+                    <a href={c.href}>{c.label}</a>
+                  ) : (
+                    <span aria-current="page">{c.label}</span>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+      {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+      <h1 set:html={title} />
+      {lead && <p class="lead">{lead}</p>}
+      <slot />
+    </div>
   </div>
 </section>
 
 <style>
   .page-hero {
-    position: relative;
-    padding: clamp(40px, 6vw, 84px) 0 clamp(36px, 5vw, 64px);
-    overflow: hidden;
+    padding: clamp(28px, 4vw, 48px) 0 clamp(28px, 4vw, 44px);
   }
-  .page-hero.tone-oat {
-    background: var(--oat);
+  .tone-ivory .hero-inner {
+    padding-top: clamp(8px, 2vw, 24px);
   }
-  .page-hero::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: min(46%, 560px);
-    height: 100%;
-    background-image: var(--comb);
-    background-size: 56px 97px;
-    -webkit-mask-image: radial-gradient(80% 90% at 85% 30%, #000 10%, transparent 72%);
-    mask-image: radial-gradient(80% 90% at 85% 30%, #000 10%, transparent 72%);
-    pointer-events: none;
-  }
-  .page-hero .container {
-    position: relative;
-    z-index: 1;
+  .tone-pink .hero-inner {
+    background: var(--pink);
+    border-radius: var(--radius);
+    padding: clamp(32px, 5vw, 64px) clamp(20px, 4vw, 48px);
   }
   h1 {
-    font-size: var(--step-4);
-    max-width: 18ch;
-    margin-bottom: 18px;
-    font-weight: 500;
-    letter-spacing: -0.025em;
+    max-width: 20ch;
+    margin-bottom: 14px;
   }
   h1 :global(em) {
-    color: var(--honey-deep);
-    font-weight: 440;
+    font-style: italic;
+    font-weight: 500;
   }
   .lead {
-    max-width: 44rem;
-    margin-bottom: 26px;
+    max-width: 52ch;
+    margin-bottom: 22px;
+  }
+  .lead:last-child {
+    margin-bottom: 0;
   }
   .crumbs ol {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin: 0 0 20px;
+    gap: 8px;
+    margin: 0 0 18px;
     padding: 0;
     list-style: none;
-    font-size: 0.86rem;
-    font-weight: 600;
-    color: var(--muted);
+    font-size: var(--step-micro);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--mauve);
   }
   .crumbs li + li::before {
     content: '/';
-    margin-right: 6px;
-    color: var(--line-strong);
+    margin-right: 8px;
+    color: var(--dashed);
   }
   .crumbs a {
-    color: var(--muted);
+    color: var(--mauve);
     text-decoration: none;
   }
   .crumbs a:hover {
-    color: var(--ink);
+    color: var(--cocoa);
+    text-decoration: underline;
   }
   .crumbs [aria-current] {
-    color: var(--ink);
+    color: var(--cocoa);
   }
 </style>

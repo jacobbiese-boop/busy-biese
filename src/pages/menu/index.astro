@@ -1,10 +1,10 @@
 ---
 import Base from '../../layouts/Base.astro';
-import ProductCard from '../../components/ProductCard.astro';
-import Icon from '../../components/Icon.astro';
+import ProductList from '../../components/ProductList.astro';
 import PageHero from '../../components/PageHero.astro';
 import { categories, productsIn, products } from '../../data/menu';
 import { site } from '../../config/site';
+import { orderLink } from '../../lib/order';
 import { breadcrumbJsonLd } from '../../lib/seo';
 
 const ld = [
@@ -32,6 +32,7 @@ const ld = [
     })),
   },
 ];
+const order = orderLink();
 ---
 
 <Base
@@ -42,12 +43,13 @@ const ld = [
   <PageHero
     eyebrow="The menu"
     title="Everything we make, <em>made to order</em>"
-    lead={`${products.length} bakes, boxes, and trays, each made fresh for you. Prices and minimums are listed on every item, and quantity pricing gets better as you go up in size.`}
+    lead={`${products.length} bakes, boxes, and trays, each made fresh for you. Tap an item to order it, or open its details for sizes, flavors, and allergens.`}
+    tone="pink"
   >
     <ul class="facts" role="list">
-      <li><Icon name="clock" size={20} /> Order {site.ordering.noticeHours} hours ahead</li>
-      <li><Icon name="box" size={20} /> Minimums apply</li>
-      <li><Icon name="truck" size={20} /> Pickup or delivery within {site.delivery.radiusMiles} miles</li>
+      <li>Order {site.ordering.noticeHours} hours ahead</li>
+      <li>Minimums apply</li>
+      <li>Pickup or delivery within {site.delivery.radiusMiles} miles</li>
     </ul>
   </PageHero>
 
@@ -69,24 +71,15 @@ const ld = [
 
   <div class="menu-sections">
     {
-      categories.map((c, i) => (
-        <section id={c.id} class:list={['menu-section', i % 2 === 1 && 'alt']} data-cat-section={c.id}>
+      categories.map((c) => (
+        <section id={c.id} class="menu-section" data-cat-section={c.id}>
           <div class="container">
             <header class="cat-head">
-              <span class="cat-badge">
-                <Icon name={c.icon} size={28} stroke={1.4} />
-              </span>
-              <div>
-                <h2>{c.name}</h2>
-                <p>{c.blurb}</p>
-                {c.note && <p class="cat-note">{c.note}</p>}
-              </div>
+              <h2>{c.name}</h2>
+              <p>{c.blurb}</p>
+              {c.note && <p class="cat-note">{c.note}</p>}
             </header>
-            <div class="grid grid-3">
-              {productsIn(c.id).map((p) => (
-                <ProductCard product={p} showCategory={false} />
-              ))}
-            </div>
+            <ProductList products={productsIn(c.id)} />
           </div>
         </section>
       ))
@@ -95,16 +88,21 @@ const ld = [
 
   <section class="section-tight">
     <div class="container">
-      <div class="menu-cta">
+      <div class="menu-cta panel">
         <div>
           <h2>Ready when you are.</h2>
           <p>
-            Send us your order at least {site.ordering.noticeHours} hours ahead. Planning for a big group? We put together
-            custom quotes for large orders.
+            Send us your order at least {site.ordering.noticeHours} hours ahead. Planning for a big group? We put
+            together custom quotes for large orders.
           </p>
         </div>
         <div class="btn-row">
-          <a class="btn" href="/order/">Start an order <Icon name="arrow" class="arrow" /></a>
+          <a
+            class="btn"
+            href={order.href}
+            target={order.external ? '_blank' : undefined}
+            rel={order.external ? 'noopener' : undefined}>Open the order form</a
+          >
           <a class="btn btn-outline" href="/catering/">Catering &amp; large orders</a>
         </div>
       </div>
@@ -147,37 +145,32 @@ const ld = [
   .facts {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px 24px;
-    font-weight: 650;
-    font-size: 0.93rem;
-    color: var(--ink-2);
+    gap: 8px 22px;
+    margin-top: 4px;
+    font-size: var(--step-micro);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
   }
-  .facts li {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .facts :global(svg) {
-    color: var(--honey-deep);
+  .facts li + li::before {
+    content: '·';
+    margin-right: 22px;
+    color: var(--rose);
   }
 
   .cat-nav {
     position: sticky;
-    top: 74px;
+    top: 70px;
     z-index: 40;
-    background: rgba(246, 239, 229, 0.94);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border-block: 1px solid var(--line);
+    background: var(--ivory);
+    border-bottom: 1px solid var(--border);
   }
   .cat-nav ul {
     display: flex;
-    gap: 8px;
+    gap: 4px;
     overflow-x: auto;
-    padding: 12px 0;
     scrollbar-width: none;
-    -webkit-mask-image: linear-gradient(90deg, #000 92%, transparent);
-    mask-image: linear-gradient(90deg, #000 92%, transparent);
+    padding: 10px 0;
+    -webkit-overflow-scrolling: touch;
   }
   .cat-nav ul::-webkit-scrollbar {
     display: none;
@@ -185,71 +178,51 @@ const ld = [
   .cat-nav a {
     display: inline-flex;
     align-items: center;
-    min-height: 40px;
-    padding: 0 16px;
+    height: 34px;
+    padding: 0 14px;
     border-radius: 999px;
-    border: 1px solid var(--line);
-    background: var(--paper);
-    font-size: 0.9rem;
-    font-weight: 700;
-    text-decoration: none;
-    color: var(--ink-2);
+    border: 1px solid transparent;
     white-space: nowrap;
+    font-size: var(--step-micro);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--cocoa);
+    text-decoration: none;
     transition:
       background-color 0.2s var(--ease),
-      color 0.2s var(--ease),
       border-color 0.2s var(--ease);
   }
   .cat-nav a:hover {
-    border-color: var(--line-strong);
-    color: var(--ink);
+    border-color: var(--pink-matte);
+    text-decoration: none;
   }
   .cat-nav a.is-active {
-    background: var(--ink);
-    border-color: var(--ink);
-    color: var(--cream);
+    background: var(--pink-matte);
+    border-color: var(--pink-matte);
   }
 
   .menu-section {
-    padding-block: clamp(48px, 6vw, 84px);
-    scroll-margin-top: 140px;
+    padding-block: clamp(36px, 5vw, 56px);
+    scroll-margin-top: 130px;
   }
-  .menu-section.alt {
-    background: var(--paper);
-  }
-  .menu-section.alt :global(.pcard) {
-    background: var(--cream);
+  .menu-section + .menu-section {
+    border-top: 1px solid var(--border);
   }
   .cat-head {
-    display: flex;
-    align-items: flex-start;
-    gap: 18px;
-    margin-bottom: clamp(24px, 3vw, 36px);
-    max-width: 720px;
+    max-width: 620px;
+    margin-bottom: clamp(18px, 2.5vw, 28px);
   }
   .cat-head h2 {
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
   .cat-head p {
     margin: 0;
-    color: var(--muted);
+    color: var(--mauve);
+    font-size: var(--step-body-small);
   }
-  .cat-head .cat-note {
-    margin-top: 10px;
-    font-size: 0.9rem;
-    font-weight: 650;
-    color: var(--honey-deep);
-  }
-  .cat-badge {
-    flex: none;
-    display: grid;
-    place-items: center;
-    width: 58px;
-    height: 67px;
-    background: var(--honey-soft);
-    color: var(--honey-deep);
-    -webkit-mask: var(--hex-mask) center / 100% 100% no-repeat;
-    mask: var(--hex-mask) center / 100% 100% no-repeat;
+  .cat-note {
+    margin-top: 8px !important;
+    font-size: var(--step-small) !important;
   }
 
   .menu-cta {
@@ -257,35 +230,14 @@ const ld = [
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 20px 40px;
-    padding: clamp(28px, 4vw, 48px);
-    border-radius: var(--radius-l);
-    background: var(--espresso);
-    color: var(--on-dark-muted);
+    gap: 24px 40px;
   }
   .menu-cta h2 {
-    color: var(--on-dark);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
   .menu-cta p {
     margin: 0;
     max-width: 52ch;
-  }
-  .menu-cta .btn-outline {
-    --btn-fg: var(--on-dark);
-    --btn-border: rgba(246, 239, 229, 0.35);
-  }
-  .menu-cta .btn-outline:hover {
-    --btn-bg: var(--on-dark);
-    --btn-fg: var(--ink);
-  }
-  .menu-cta .btn:not(.btn-outline) {
-    --btn-bg: var(--honey);
-    --btn-fg: var(--ink);
-    --btn-border: var(--honey);
-  }
-  .menu-cta .btn:not(.btn-outline):hover {
-    --btn-bg: var(--cream);
-    --btn-border: var(--cream);
+    font-size: var(--step-body-small);
   }
 </style>

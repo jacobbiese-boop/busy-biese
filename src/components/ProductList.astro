@@ -1,0 +1,179 @@
+---
+/**
+ * Products as buttons. Each one is a white tile that sends the visitor to the
+ * order form with the item filled in; a small "Details" link opens the item's
+ * own page (sizes, flavors, allergens).
+ */
+import type { Product } from '../data/menu';
+import { priceLabel } from '../lib/format';
+import { orderLink } from '../lib/order';
+import Icon from './Icon.astro';
+
+interface Props {
+  products: Product[];
+  /** Show the one-line description under the name. */
+  describe?: boolean;
+  /** Show the "Details" link to the item page. */
+  details?: boolean;
+  columns?: 2 | 3;
+  class?: string;
+}
+
+const { products, describe = true, details = true, columns = 3, class: className } = Astro.props;
+---
+
+<ul class:list={['plist', `plist-${columns}`, className]} role="list">
+  {
+    products.map((p) => {
+      const link = orderLink(p.name);
+      const minShort = p.minimum?.replace(/\. .*$/, '');
+      return (
+        <li class="plist-item">
+          <a
+            class="plist-main"
+            href={link.href}
+            target={link.external ? '_blank' : undefined}
+            rel={link.external ? 'noopener' : undefined}
+          >
+            <span class="plist-name">{p.name}</span>
+            {describe && p.short && <span class="plist-desc">{p.short}</span>}
+            {minShort && <span class="plist-min">{minShort}</span>}
+            <span class="plist-foot">
+              <span class="plist-price">{priceLabel(p)}</span>
+              <span class="plist-go">
+                Order <Icon name="arrow" size={12} stroke={1.8} class="arrow" />
+              </span>
+            </span>
+          </a>
+          {details && (
+            <a class="plist-details" href={`/menu/${p.slug}/`}>
+              Details<span class="visually-hidden">: {p.name}</span>
+            </a>
+          )}
+        </li>
+      );
+    })
+  }
+</ul>
+
+<style>
+  .plist {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  }
+  .plist-2 {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+  }
+  .plist-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+    transition:
+      background-color 0.25s var(--ease),
+      border-color 0.25s var(--ease),
+      transform 0.25s var(--ease),
+      box-shadow 0.25s var(--ease);
+  }
+  .plist-item:hover {
+    background: var(--pink-matte);
+    border-color: var(--pink-matte);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-s);
+  }
+  .plist-item:focus-within {
+    border-color: var(--cocoa);
+  }
+  .plist-main {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 18px 16px;
+    color: var(--cocoa);
+    text-decoration: none;
+    flex: 1;
+  }
+  .plist-main:hover {
+    text-decoration: none;
+    color: var(--cocoa);
+  }
+  .plist-main::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+  .plist-main:focus-visible {
+    outline: none;
+  }
+  .plist-name {
+    font-family: var(--font-display);
+    font-size: var(--step-h3);
+    font-weight: 600;
+    line-height: 1.2;
+    padding-right: 56px;
+  }
+  .plist-desc {
+    font-size: var(--step-small);
+    line-height: 1.5;
+    color: var(--mauve);
+  }
+  .plist-item:hover .plist-desc {
+    color: var(--cocoa);
+  }
+  .plist-foot {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+    font-size: var(--step-micro);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+  .plist-min {
+    font-size: var(--step-tiny);
+    letter-spacing: 0.06em;
+    color: var(--mauve);
+  }
+  .plist-item:hover .plist-min {
+    color: var(--cocoa);
+  }
+  .plist-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    flex: none;
+  }
+  .plist-go :global(svg) {
+    transition: transform 0.25s var(--ease);
+  }
+  .plist-item:hover .plist-go :global(svg) {
+    transform: translateX(3px);
+  }
+  .plist-details {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 1;
+    font-size: var(--step-micro);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mauve);
+    text-decoration: none;
+    padding: 4px 2px;
+    border-bottom: 1px solid transparent;
+  }
+  .plist-details:hover {
+    color: var(--cocoa);
+    border-color: var(--cocoa);
+    text-decoration: none;
+  }
+  .plist-item:hover .plist-details {
+    color: var(--cocoa);
+  }
+</style>

@@ -1,57 +1,48 @@
 /* ==========================================================================
-   Busy Biese design system
-   Warm cream paper, espresso ink, honey accents, and a quiet hexagon motif.
+   Busy Biese design system (Visual System 1.0)
+   Ivory page, dusty pink panels, cocoa type, a line-drawn bee.
+   Headlines in Cormorant Garamond, everything else in Jost, the name in
+   Parisienne (only ever inside the lockup).
    ========================================================================== */
 
 :root {
   /* Color */
-  --ink: #231a15;
-  --ink-2: #4e4037;
-  --muted: #6e5e53;
-  --honey: #d9962c;
-  --honey-deep: #8a5710;
-  --honey-soft: #f1d9a8;
-  --honey-wash: #f8ead0;
-  --cream: #f6efe5;
-  --paper: #fcf9f4;
-  --oat: #efe4d4;
-  --crust: #e7d8c3;
-  --espresso: #2b1f18;
-  --espresso-2: #3a2a20;
-  --line: rgba(35, 26, 21, 0.12);
-  --line-strong: rgba(35, 26, 21, 0.22);
-  --on-dark: #f6efe5;
-  --on-dark-muted: #d8c9b6;
+  --cocoa: #5c3a33; /* the mark, type, buttons */
+  --pink: #f2d4d4; /* dusty pink: panels, packaging ground */
+  --pink-matte: #e6b8b8; /* fills, hover states, image areas */
+  --pink-wash: #f7e7e4; /* a lighter wash for subtle fills */
+  --rose: #a8646a; /* soft mark, labels, graphics */
+  --rose-text: #a05e64; /* rose for links in running text (meets AA on ivory) */
+  --mauve: #8c5a60; /* captions, secondary text */
+  --ivory: #fbf7f2; /* page background, cards on pink */
+  --white: #ffffff; /* tiles */
+  --border: #e8d5d2;
+  --dashed: #d9b4b4;
+  --cocoa-deep: #4a2e29; /* hover on cocoa surfaces */
+  --shadow: 0 10px 24px rgba(92, 58, 51, 0.2);
+  --shadow-s: 0 2px 8px rgba(92, 58, 51, 0.08);
 
   /* Type */
-  --font-display: 'Fraunces Variable', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
-  --font-body: 'Manrope Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-script: 'Parisienne', cursive;
+  --font-display: 'Cormorant Garamond Variable', 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-body: 'Jost Variable', 'Jost', 'Futura', 'Century Gothic', sans-serif;
 
-  --step-hero: clamp(2.65rem, 5.6vw + 0.6rem, 5.4rem);
-  --step-4: clamp(2.05rem, 3.4vw + 0.7rem, 3.5rem);
-  --step-3: clamp(1.65rem, 2vw + 0.85rem, 2.45rem);
-  --step-2: clamp(1.25rem, 0.8vw + 1rem, 1.6rem);
-  --step-1: 1.125rem;
+  --step-h1: clamp(2.125rem, 1.7rem + 1.4vw, 2.75rem); /* 34 to 44 */
+  --step-h2: clamp(1.625rem, 1.5rem + 0.4vw, 1.875rem); /* 26 to 30 */
+  --step-h3: 1.25rem; /* 20 */
   --step-0: 1rem;
-  --step-small: 0.9rem;
-  --step-tiny: 0.78rem;
+  --step-body-small: 0.9375rem; /* 15 */
+  --step-small: 0.8125rem; /* 13 */
+  --step-tiny: 0.75rem; /* 12 */
+  --step-micro: 0.6875rem; /* 11 */
 
   /* Space and shape */
   --gutter: clamp(16px, 4vw, 32px);
   --max: 1200px;
-  --section: clamp(64px, 9vw, 120px);
-  --radius-s: 10px;
-  --radius: 18px;
-  --radius-l: 28px;
-  --shadow-s: 0 1px 2px rgba(35, 26, 21, 0.06), 0 2px 8px rgba(35, 26, 21, 0.05);
-  --shadow: 0 2px 6px rgba(35, 26, 21, 0.06), 0 18px 40px -18px rgba(35, 26, 21, 0.28);
+  --section: clamp(56px, 8vw, 104px);
+  --radius-s: 6px; /* tiles and cards */
+  --radius: 8px; /* frames and panels */
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-
-  /* Rounded hexagon used as an image mask */
-  --hex-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 115.47'%3E%3Cpath d='M54.5 2.6L95.5 26.27A9 9 0 0 1 100 34.06L100 81.41A9 9 0 0 1 95.5 89.2L54.5 112.87A9 9 0 0 1 45.5 112.87L4.5 89.2A9 9 0 0 1 0 81.41L0 34.06A9 9 0 0 1 4.5 26.27L45.5 2.6A9 9 0 0 1 54.5 2.6Z'/%3E%3C/svg%3E");
-
-  /* Honeycomb line pattern */
-  --comb: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='97' viewBox='0 0 56 97'%3E%3Cpath d='M28 0l28 16.2v32.3L28 64.7 0 48.5V16.2zM28 64.7v32.3' fill='none' stroke='%238a5710' stroke-opacity='.16' stroke-width='1.2'/%3E%3C/svg%3E");
 
   color-scheme: light;
 }
@@ -69,17 +60,17 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-behavior: smooth;
-  scroll-padding-top: 96px;
+  scroll-padding-top: 88px;
 }
 
 body {
   margin: 0;
-  background: var(--cream);
-  color: var(--ink);
+  background: var(--ivory);
+  color: var(--cocoa);
   font-family: var(--font-body);
+  font-weight: 300;
   font-size: var(--step-0);
-  line-height: 1.65;
-  font-optical-sizing: auto;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -102,27 +93,32 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  font-weight: 520;
-  line-height: 1.08;
-  letter-spacing: -0.015em;
   margin: 0 0 0.5em;
-  color: var(--ink);
+  color: var(--cocoa);
   text-wrap: balance;
 }
 
 h1 {
-  font-size: var(--step-4);
+  font-size: var(--step-h1);
+  font-weight: 600;
+  line-height: 1.1;
 }
 h2 {
-  font-size: var(--step-3);
-}
-h3 {
-  font-size: var(--step-2);
+  font-size: var(--step-h2);
+  font-weight: 500;
   line-height: 1.2;
 }
+h3 {
+  font-size: var(--step-h3);
+  font-weight: 600;
+  line-height: 1.25;
+}
 h4 {
-  font-size: var(--step-1);
-  line-height: 1.3;
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
 }
 
 p {
@@ -130,31 +126,36 @@ p {
   text-wrap: pretty;
 }
 
+strong,
+b {
+  font-weight: 500;
+}
+
+/* Links in running text are rose and underlined; buttons, nav and tiles turn the underline off. */
 a {
-  color: inherit;
+  color: var(--rose-text);
+  text-decoration: underline;
   text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
+  text-underline-offset: 0.18em;
+  text-decoration-color: var(--dashed);
 }
-
 a:hover {
-  color: var(--honey-deep);
+  text-decoration-color: currentColor;
 }
 
-em,
-.accent {
+em {
   font-style: italic;
-  font-weight: inherit;
 }
 
 ::selection {
-  background: var(--honey-soft);
-  color: var(--ink);
+  background: var(--pink-matte);
+  color: var(--cocoa);
 }
 
 :focus-visible {
-  outline: 2.5px solid var(--honey-deep);
+  outline: 2px solid var(--cocoa);
   outline-offset: 3px;
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
 button {
@@ -169,21 +170,28 @@ ol[role='list'] {
   padding: 0;
 }
 
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 2em 0;
+}
+
 .skip-link {
   position: absolute;
   left: 12px;
   top: -60px;
   z-index: 100;
-  background: var(--ink);
-  color: var(--cream);
+  background: var(--cocoa);
+  color: var(--ivory);
   padding: 10px 16px;
-  border-radius: var(--radius-s);
-  font-weight: 700;
+  border-radius: 999px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
   text-decoration: none;
 }
 .skip-link:focus {
   top: 12px;
-  color: var(--cream);
+  color: var(--ivory);
 }
 
 .visually-hidden {
@@ -216,45 +224,63 @@ ol[role='list'] {
 }
 
 .section-tight {
-  padding-block: clamp(48px, 6vw, 80px);
+  padding-block: clamp(40px, 5vw, 64px);
 }
 
-.section-oat {
-  background: var(--oat);
+/* Dusty pink panel: a rounded block inside the page, never wall to wall. */
+.panel {
+  background: var(--pink);
+  color: var(--cocoa);
+  border-radius: var(--radius);
+  padding: clamp(28px, 4vw, 56px) clamp(20px, 3.5vw, 40px);
+}
+.panel-white {
+  background: var(--white);
+  border: 1px solid var(--border);
+}
+.panel-ivory {
+  background: var(--ivory);
 }
 
-.section-paper {
-  background: var(--paper);
+/* Cocoa band: footer and a single dark moment per page at most. */
+.section-cocoa {
+  background: var(--cocoa);
+  color: var(--pink);
 }
-
-.section-dark {
-  background: var(--espresso);
-  color: var(--on-dark);
+.section-cocoa h1,
+.section-cocoa h2,
+.section-cocoa h3,
+.section-cocoa h4 {
+  color: var(--ivory);
 }
-.section-dark h2,
-.section-dark h3,
-.section-dark h4 {
-  color: var(--on-dark);
+.section-cocoa p {
+  color: var(--pink);
 }
-.section-dark p {
-  color: var(--on-dark-muted);
+.section-cocoa a {
+  color: var(--pink);
+}
+.section-cocoa .eyebrow {
+  color: var(--pink-matte);
 }
 
 .section-head {
-  max-width: 680px;
-  margin-bottom: clamp(32px, 4vw, 52px);
+  max-width: 640px;
+  margin-bottom: clamp(24px, 3vw, 40px);
 }
 .section-head.center {
   margin-inline: auto;
   text-align: center;
 }
+.section-head h2 {
+  margin-bottom: 0.35em;
+}
 .section-head > p:not(.eyebrow) {
-  color: var(--muted);
-  font-size: var(--step-1);
+  color: var(--mauve);
+  font-size: var(--step-body-small);
   margin: 0;
 }
-.section-dark .section-head > p:not(.eyebrow) {
-  color: var(--on-dark-muted);
+.panel .section-head > p:not(.eyebrow) {
+  color: var(--cocoa);
 }
 
 .split {
@@ -273,54 +299,65 @@ ol[role='list'] {
 
 .grid {
   display: grid;
-  gap: clamp(16px, 2.2vw, 28px);
+  gap: clamp(14px, 1.8vw, 20px);
 }
 .grid-2 {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
 }
 .grid-3 {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
 }
 .grid-4 {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
 }
 
 /* --------------------------------------------------------------------------
    Type helpers
    -------------------------------------------------------------------------- */
 .eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+  display: block;
   font-family: var(--font-body);
   font-size: var(--step-tiny);
-  font-weight: 750;
-  letter-spacing: 0.16em;
+  font-weight: 400;
+  letter-spacing: 0.4em;
   text-transform: uppercase;
-  color: var(--honey-deep);
-  margin: 0 0 18px;
+  color: var(--cocoa);
+  margin: 0 0 14px;
 }
-.eyebrow::before {
-  content: '';
-  width: 11px;
-  height: 12.7px;
-  background: currentColor;
-  -webkit-mask: var(--hex-mask) center / contain no-repeat;
-  mask: var(--hex-mask) center / contain no-repeat;
-  flex: none;
+.eyebrow-rose {
+  color: var(--rose);
+  font-size: var(--step-micro);
+  letter-spacing: 0.35em;
 }
-.section-dark .eyebrow {
-  color: var(--honey);
+
+.caption {
+  font-size: var(--step-tiny);
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  color: var(--mauve);
+}
+
+.label {
+  font-size: var(--step-micro);
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--mauve);
 }
 
 .lead {
-  font-size: clamp(1.08rem, 0.4vw + 1rem, 1.25rem);
+  font-size: var(--step-body-small);
   line-height: 1.6;
-  color: var(--ink-2);
+  max-width: 48ch;
+}
+@media (min-width: 700px) {
+  .lead {
+    font-size: 1.0625rem;
+  }
 }
 
 .muted {
-  color: var(--muted);
+  color: var(--mauve);
 }
 
 .small {
@@ -335,49 +372,56 @@ ol[role='list'] {
   font-family: var(--font-display);
 }
 
+.serif-num {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
 /* --------------------------------------------------------------------------
-   Buttons
+   Buttons: pills, Jost 12px tracked caps. One primary button per screen.
    -------------------------------------------------------------------------- */
 .btn {
-  --btn-bg: var(--ink);
-  --btn-fg: var(--cream);
-  --btn-border: var(--ink);
+  --btn-bg: var(--cocoa);
+  --btn-fg: var(--ivory);
+  --btn-border: var(--cocoa);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-height: 50px;
-  padding: 0 24px;
+  padding: 14px 26px;
   border-radius: 999px;
-  border: 1.5px solid var(--btn-border);
+  border: 1px solid var(--btn-border);
   background: var(--btn-bg);
   color: var(--btn-fg);
   font-family: var(--font-body);
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  font-size: var(--step-tiny);
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
   text-decoration: none;
+  line-height: 1.2;
   cursor: pointer;
+  white-space: nowrap;
   transition:
     background-color 0.2s var(--ease),
     color 0.2s var(--ease),
     border-color 0.2s var(--ease),
     transform 0.2s var(--ease);
-  white-space: nowrap;
 }
 .btn:hover {
-  --btn-bg: var(--honey);
-  --btn-fg: var(--ink);
-  --btn-border: var(--honey);
-  color: var(--btn-fg);
+  --btn-bg: var(--pink-matte);
+  --btn-fg: var(--cocoa);
+  --btn-border: var(--pink-matte);
+  text-decoration: none;
 }
 .btn:active {
   transform: translateY(1px);
 }
 .btn svg {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
   flex: none;
+  margin-right: -0.2em;
   transition: transform 0.2s var(--ease);
 }
 .btn:hover svg.arrow {
@@ -386,41 +430,40 @@ ol[role='list'] {
 
 .btn-outline {
   --btn-bg: transparent;
-  --btn-fg: var(--ink);
-  --btn-border: var(--line-strong);
+  --btn-fg: var(--cocoa);
+  --btn-border: var(--cocoa);
 }
 .btn-outline:hover {
-  --btn-bg: var(--ink);
-  --btn-fg: var(--cream);
-  --btn-border: var(--ink);
+  --btn-bg: var(--pink-matte);
+  --btn-fg: var(--cocoa);
+  --btn-border: var(--pink-matte);
 }
 
-.btn-honey {
-  --btn-bg: var(--honey);
-  --btn-fg: var(--ink);
-  --btn-border: var(--honey);
+/* On a cocoa band */
+.btn-ivory {
+  --btn-bg: var(--ivory);
+  --btn-fg: var(--cocoa);
+  --btn-border: var(--ivory);
 }
-.btn-honey:hover {
-  --btn-bg: var(--cream);
-  --btn-fg: var(--ink);
-  --btn-border: var(--cream);
+.btn-ivory:hover {
+  --btn-bg: var(--pink-matte);
+  --btn-fg: var(--cocoa);
+  --btn-border: var(--pink-matte);
 }
-
-.btn-ghost-dark {
+.btn-ghost-pink {
   --btn-bg: transparent;
-  --btn-fg: var(--on-dark);
-  --btn-border: rgba(246, 239, 229, 0.35);
+  --btn-fg: var(--pink);
+  --btn-border: var(--pink);
 }
-.btn-ghost-dark:hover {
-  --btn-bg: var(--on-dark);
-  --btn-fg: var(--ink);
-  --btn-border: var(--on-dark);
+.btn-ghost-pink:hover {
+  --btn-bg: var(--pink);
+  --btn-fg: var(--cocoa);
+  --btn-border: var(--pink);
 }
 
 .btn-small {
-  min-height: 42px;
-  padding: 0 18px;
-  font-size: 0.88rem;
+  padding: 10px 18px;
+  font-size: var(--step-micro);
 }
 
 .btn-row {
@@ -433,18 +476,23 @@ ol[role='list'] {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-weight: 700;
+  font-size: var(--step-micro);
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--cocoa);
   text-decoration: none;
-  color: var(--ink);
-  border-bottom: 1.5px solid var(--honey);
-  padding-bottom: 2px;
+  border-bottom: 1px solid var(--cocoa);
+  padding-bottom: 4px;
 }
 .text-link:hover {
-  color: var(--honey-deep);
+  color: var(--rose-text);
+  border-color: var(--rose-text);
+  text-decoration: none;
 }
 .text-link svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 /* --------------------------------------------------------------------------
@@ -454,26 +502,25 @@ ol[role='list'] {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 26px;
-  padding: 0 11px;
+  height: 24px;
+  padding: 0 10px;
   border-radius: 999px;
-  background: var(--paper);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  font-size: 0.72rem;
-  font-weight: 750;
-  letter-spacing: 0.08em;
+  background: var(--ivory);
+  color: var(--cocoa);
+  border: 1px solid var(--border);
+  font-size: 0.625rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   white-space: nowrap;
 }
-.badge-honey {
-  background: var(--honey-soft);
+.badge-pink {
+  background: var(--pink);
   border-color: transparent;
-  color: var(--ink);
 }
-.badge-dark {
-  background: var(--ink);
-  color: var(--cream);
+.badge-cocoa {
+  background: var(--cocoa);
+  color: var(--ivory);
   border-color: transparent;
 }
 
@@ -488,64 +535,48 @@ ol[role='list'] {
 .chip {
   display: inline-flex;
   align-items: center;
-  min-height: 34px;
+  min-height: 32px;
   padding: 0 14px;
   border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--paper);
-  font-size: 0.86rem;
-  font-weight: 600;
-  color: var(--ink-2);
+  border: 1px solid var(--border);
+  background: var(--white);
+  font-size: var(--step-small);
+  font-weight: 400;
+  color: var(--cocoa);
 }
 
 /* --------------------------------------------------------------------------
-   Cards
+   Cards and tiles: white, 1px border, 6px corners
    -------------------------------------------------------------------------- */
 .card {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
   overflow: hidden;
 }
 
-.panel {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-l);
-  padding: clamp(22px, 3.5vw, 40px);
+.tile {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  padding: 22px 22px 20px;
 }
 
 /* --------------------------------------------------------------------------
-   Hexagon shapes and photo placeholders
+   Photo placeholder: a pink panel with a small rose bee
    -------------------------------------------------------------------------- */
-.hex {
-  aspect-ratio: 100 / 115.47;
-  -webkit-mask: var(--hex-mask) center / 100% 100% no-repeat;
-  mask: var(--hex-mask) center / 100% 100% no-repeat;
-}
-
-.comb-bg {
-  background-image: var(--comb);
-  background-size: 56px 97px;
-}
-
 .ph {
   position: relative;
   display: grid;
   place-items: center;
   width: 100%;
   height: 100%;
-  background-color: var(--honey-wash);
-  background-image: var(--comb), radial-gradient(120% 90% at 30% 20%, #fbf1df 0%, #f1dfc2 60%, #e8d2b0 100%);
-  background-size:
-    56px 97px,
-    100% 100%;
-  color: var(--honey-deep);
+  background: var(--pink);
+  color: var(--rose);
 }
 .ph svg {
-  width: clamp(36px, 22%, 72px);
+  width: clamp(32px, 22%, 64px);
   height: auto;
-  opacity: 0.85;
 }
 
 /* --------------------------------------------------------------------------
@@ -553,7 +584,7 @@ ol[role='list'] {
    -------------------------------------------------------------------------- */
 .js [data-reveal] {
   opacity: 0;
-  transform: translateY(18px);
+  transform: translateY(14px);
   transition:
     opacity 0.7s var(--ease),
     transform 0.7s var(--ease);
@@ -567,18 +598,19 @@ ol[role='list'] {
    Prose (policy and about pages)
    -------------------------------------------------------------------------- */
 .prose {
-  color: var(--ink-2);
+  color: var(--cocoa);
 }
 .prose h2 {
-  font-size: var(--step-2);
-  margin-top: 2.2em;
+  margin-top: 2em;
 }
 .prose h3 {
-  font-size: var(--step-1);
   font-family: var(--font-body);
-  font-weight: 750;
-  letter-spacing: 0;
-  margin-top: 1.6em;
+  font-size: var(--step-small);
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-top: 1.8em;
+  margin-bottom: 0.8em;
 }
 .prose ul {
   padding-left: 1.2em;
@@ -587,7 +619,7 @@ ol[role='list'] {
   margin-bottom: 0.45em;
 }
 .prose li::marker {
-  color: var(--honey-deep);
+  color: var(--rose);
 }
 
 /* --------------------------------------------------------------------------

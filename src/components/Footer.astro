@@ -6,47 +6,29 @@ import Icon from './Icon.astro';
 
 const year = new Date().getFullYear();
 const { email, phone } = site.contact;
+const webHost = 'busybiese.com';
 ---
 
 <footer class="site-footer">
   <div class="container">
-    <div class="footer-cta">
-      <div>
-        <p class="eyebrow">Made to order</p>
-        <p class="footer-tagline">{site.tagline}</p>
-      </div>
-      <div class="btn-row">
-        <a href="/order/" class="btn btn-honey">Start an order <Icon name="arrow" class="arrow" /></a>
-        <a href="/menu/" class="btn btn-ghost-dark">See the menu</a>
-      </div>
-    </div>
-
-    <div class="footer-grid">
+    <div class="footer-top">
       <div class="footer-brand">
-        <a href="/" aria-label="Busy Biese, home" class="footer-logo"><Logo tone="light" size={38} /></a>
-        <p>
+        <a href="/" class="footer-logo"><Logo size="footer" label="Busy Biese, home" /></a>
+        <p class="footer-blurb">
           A small-batch, made-to-order bakery in {site.location.city}, {site.location.region}. Baking since {
             site.established
           }.
         </p>
-        <div class="social">
-          <a href={site.links.instagram} target="_blank" rel="noopener" aria-label="Instagram">
-            <Icon name="instagram" size={20} />
-          </a>
-          <a href={site.links.whatsapp} target="_blank" rel="noopener" aria-label="WhatsApp community">
-            <Icon name="chat" size={20} />
-          </a>
-          {
-            email && (
-              <a href={`mailto:${email}`} aria-label="Email">
-                <Icon name="mail" size={20} />
-              </a>
-            )
-          }
+        <div class="footer-info">
+          <span>{site.location.city}, {site.location.region} {site.location.postalCode}</span>
+          {phone && <a href={`tel:${phone.replace(/[^0-9+]/g, '')}`}>{phone}</a>}
+          {email && <a href={`mailto:${email}`}>{email}</a>}
+          <a href="/">{webHost}</a>
+          <a href={site.links.instagram} target="_blank" rel="noopener">{site.links.instagramHandle}</a>
         </div>
       </div>
 
-      <nav aria-label="Footer: explore">
+      <nav aria-label="Footer: explore" class="footer-col">
         <h2 class="footer-head">Explore</h2>
         <ul role="list">
           <li><a href="/menu/">Menu</a></li>
@@ -57,7 +39,7 @@ const { email, phone } = site.contact;
         </ul>
       </nav>
 
-      <nav aria-label="Footer: menu">
+      <nav aria-label="Footer: menu" class="footer-col">
         <h2 class="footer-head">The menu</h2>
         <ul role="list">
           {
@@ -70,27 +52,28 @@ const { email, phone } = site.contact;
         </ul>
       </nav>
 
-      <div>
+      <div class="footer-col">
         <h2 class="footer-head">Pickup &amp; delivery</h2>
         <ul role="list" class="facts">
-          <li><Icon name="pin" size={18} /> {site.location.city}, {site.location.region}</li>
-          <li><Icon name="truck" size={18} /> Delivery within {site.delivery.radiusMiles} miles</li>
-          <li><Icon name="clock" size={18} /> Order {site.ordering.noticeHours} hours ahead</li>
-          {
-            phone && (
-              <li>
-                <Icon name="phone" size={18} /> <a href={`tel:${phone.replace(/[^0-9+]/g, '')}`}>{phone}</a>
-              </li>
-            )
-          }
+          <li>Pickup in {site.location.city}</li>
+          <li>Delivery within {site.delivery.radiusMiles} miles</li>
+          <li>Order {site.ordering.noticeHours} hours ahead</li>
+        </ul>
+        <div class="social">
+          <a href={site.links.instagram} target="_blank" rel="noopener" aria-label="Instagram">
+            <Icon name="instagram" size={18} stroke={1.5} />
+          </a>
+          <a href={site.links.whatsapp} target="_blank" rel="noopener" aria-label="WhatsApp community">
+            <Icon name="chat" size={18} stroke={1.5} />
+          </a>
           {
             email && (
-              <li>
-                <Icon name="mail" size={18} /> <a href={`mailto:${email}`}>{email}</a>
-              </li>
+              <a href={`mailto:${email}`} aria-label="Email">
+                <Icon name="mail" size={18} stroke={1.5} />
+              </a>
             )
           }
-        </ul>
+        </div>
       </div>
     </div>
 
@@ -107,112 +90,90 @@ const { email, phone } = site.contact;
 
 <style>
   .site-footer {
-    background: var(--espresso);
-    color: var(--on-dark-muted);
-    padding: clamp(56px, 8vw, 96px) 0 28px;
-    position: relative;
-    overflow: hidden;
-  }
-  .site-footer::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='97' viewBox='0 0 56 97'%3E%3Cpath d='M28 0l28 16.2v32.3L28 64.7 0 48.5V16.2zM28 64.7v32.3' fill='none' stroke='%23d9962c' stroke-opacity='.07' stroke-width='1.2'/%3E%3C/svg%3E");
-    background-size: 56px 97px;
-    -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 55%);
-    mask-image: linear-gradient(180deg, #000 0%, transparent 55%);
-    pointer-events: none;
-  }
-  .site-footer > .container {
-    position: relative;
+    background: var(--cocoa);
+    color: var(--pink);
+    padding: clamp(44px, 6vw, 72px) 0 24px;
+    font-size: var(--step-small);
+    line-height: 1.8;
   }
   .site-footer a {
-    color: var(--on-dark);
+    color: var(--pink);
     text-decoration: none;
   }
   .site-footer a:hover {
-    color: var(--honey);
+    color: var(--ivory);
+    text-decoration: underline;
   }
 
-  .footer-cta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 24px 40px;
-    padding-bottom: clamp(36px, 5vw, 56px);
-    border-bottom: 1px solid rgba(246, 239, 229, 0.14);
-  }
-  .footer-cta .eyebrow {
-    color: var(--honey);
-  }
-  .footer-tagline {
-    font-family: var(--font-display);
-    font-size: var(--step-4);
-    line-height: 1.02;
-    letter-spacing: -0.02em;
-    color: var(--on-dark);
-    margin: 0;
-  }
-
-  .footer-grid {
+  .footer-top {
     display: grid;
     gap: 36px 28px;
-    padding-block: clamp(36px, 5vw, 56px);
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+    padding-bottom: clamp(32px, 4vw, 48px);
   }
-  .footer-brand p {
-    margin: 18px 0 18px;
-    max-width: 34ch;
+  @media (min-width: 900px) {
+    .footer-top {
+      grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+    }
   }
+
   .footer-logo {
     display: inline-flex;
+    color: var(--pink);
+    border-radius: 4px;
   }
-  .footer-logo :global(.logo-word) {
-    color: var(--on-dark);
+  .footer-logo:hover {
+    color: var(--pink);
+    text-decoration: none;
+  }
+  .footer-blurb {
+    margin: 18px 0 16px;
+    max-width: 34ch;
+    color: var(--pink);
+  }
+  .footer-info {
+    display: flex;
+    flex-direction: column;
+    color: var(--pink-matte);
+  }
+  .footer-info a {
+    color: var(--pink-matte);
+    align-self: flex-start;
+  }
+
+  .footer-head {
+    font-family: var(--font-body);
+    font-size: var(--step-micro);
+    font-weight: 400;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--ivory);
+    margin: 6px 0 14px;
+  }
+  .footer-col li {
+    margin-bottom: 4px;
   }
 
   .social {
     display: flex;
     gap: 10px;
+    margin-top: 18px;
   }
   .social a {
     display: inline-grid;
     place-items: center;
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
     border-radius: 999px;
-    border: 1px solid rgba(246, 239, 229, 0.22);
+    border: 1px solid rgba(242, 212, 212, 0.4);
     transition:
       background-color 0.2s var(--ease),
       color 0.2s var(--ease);
   }
   .social a:hover {
-    background: var(--honey);
-    color: var(--ink);
-    border-color: var(--honey);
-  }
-
-  .footer-head {
-    font-family: var(--font-body);
-    font-size: var(--step-tiny);
-    font-weight: 750;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--honey);
-    margin: 4px 0 16px;
-  }
-  .footer-grid ul li {
-    margin-bottom: 10px;
-  }
-  .facts li {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .facts :global(svg) {
-    color: var(--honey);
-    flex: none;
+    background: var(--pink);
+    color: var(--cocoa);
+    border-color: var(--pink);
   }
 
   .footer-bottom {
@@ -220,9 +181,11 @@ const { email, phone } = site.contact;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 8px 24px;
-    padding-top: 22px;
-    border-top: 1px solid rgba(246, 239, 229, 0.14);
+    padding-top: 20px;
+    border-top: 1px solid rgba(242, 212, 212, 0.25);
     font-size: var(--step-tiny);
+    letter-spacing: 0.04em;
+    color: var(--pink-matte);
   }
   .footer-bottom p {
     margin: 0;
@@ -230,8 +193,6 @@ const { email, phone } = site.contact;
     gap: 10px;
   }
   .footer-bottom a {
-    color: var(--on-dark-muted);
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    color: var(--pink-matte);
   }
 </style>

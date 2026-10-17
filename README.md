@@ -28,14 +28,14 @@ Also built automatically: `sitemap-index.xml`, `robots.txt`, search-engine data 
 | Delivery radius, fees, delivery windows | `src/config/site.ts` (`delivery`) |
 | Show the Fillout form right on the Order page | `src/config/site.ts` (`fillout.formId`) |
 | Live web address (domain) | `astro.config.mjs` (`SITE_URL`) |
-| Colors and fonts | `src/styles/global.css` (top of the file) |
+| Colors and fonts | `src/styles/global.css` (top of the file). The look follows the Busy Biese Visual System 1.0: ivory page, dusty pink panels, cocoa type, Parisienne for the name, Cormorant Garamond headlines, Jost text. |
 
 Commit the change to the `main` branch on GitHub and Hostinger rebuilds the site automatically in about a minute.
 
 ## Photos
 
 Photos live in `public/photos` as WebP files named after the item (for example `cinnamon-rolls-800.webp`).
-Until a photo exists, the site shows a honeycomb placeholder, so nothing breaks.
+Until a photo exists, the site shows a dusty pink panel with a small bee, so nothing breaks.
 See `docs/PHOTOS.md` for the full list of photo names and `scripts/import_photos.py` to convert original photos.
 
 ## Hostinger build settings
@@ -67,10 +67,10 @@ Requires Node.js 22.12 or newer.
 src/config/site.ts     business settings
 src/data/menu.ts       the menu
 src/pages/             one file per page
-src/components/        header, footer, product card, photo, icons, logo
+src/components/        header, footer, bee mark, lockup, product list, gallery, photo, icons
 src/layouts/Base.astro page shell, SEO tags, scripts
 src/styles/global.css  design system
 public/                logo files, icons, social image, photos
-scripts/               photo import tool
+scripts/               photo import tool, brand asset generator
 docs/                  notes
 ```

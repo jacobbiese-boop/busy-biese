@@ -5,6 +5,7 @@ import Icon from '../components/Icon.astro';
 import { site } from '../config/site';
 import { categories, productsIn } from '../data/menu';
 import { priceLabel } from '../lib/format';
+import { orderLink } from '../lib/order';
 import { faqJsonLd } from '../lib/seo';
 
 const { flatFee, flatFeeUpTo, percentOver, radiusMiles, windows } = site.delivery;
@@ -21,7 +22,7 @@ const faqs = [
   },
   {
     q: 'Do you deliver?',
-    a: `Yes, within ${radiusMiles} miles of ${site.location.city}. Delivery is $${flatFee} on orders up to $${flatFeeUpTo} and ${percentOver}% of the order total above that. You can also pick up in ${site.location.city}.`,
+    a: `Yes, within ${radiusMiles} miles of ${site.location.city}. Delivery is $${flatFee} on orders up to $${flatFeeUpTo}. Above $${flatFeeUpTo}, the fee is ${percentOver}% of the order total. You can also pick up in ${site.location.city}.`,
   },
   {
     q: 'Can I order for a large event?',
@@ -43,9 +44,10 @@ const faqs = [
     eyebrow="Order"
     title="Place an <em>order</em>"
     lead="Tell us what you would like and when you need it. We will confirm your order, timing, and total with you."
+    tone="pink"
   >
     <p class="picked" data-picked hidden>
-      <Icon name="check-badge" size={20} />
+      <Icon name="check-badge" size={18} stroke={1.5} />
       <span>You picked <strong data-picked-name></strong>. Add it to your order below.</span>
     </p>
   </PageHero>
@@ -53,31 +55,26 @@ const faqs = [
   <section class="section-tight essentials-wrap">
     <div class="container">
       <ul class="essentials" role="list">
-        <li>
-          <Icon name="clock" size={28} stroke={1.4} />
+        <li class="tile">
           <h2>Order ahead</h2>
           <p>
             At least {site.ordering.noticeHours} hours for most items, 48 hours for strawberry boxes. Same-day orders are
             not available.
           </p>
         </li>
-        <li>
-          <Icon name="box" size={28} stroke={1.4} />
+        <li class="tile">
           <h2>Minimums</h2>
-          <p>Most items have a small minimum, listed on each menu page. Mix flavors where noted.</p>
+          <p>Most items have a small minimum, listed on each menu item. Mix flavors where noted.</p>
         </li>
-        <li>
-          <Icon name="pin" size={28} stroke={1.4} />
+        <li class="tile">
           <h2>Pickup</h2>
           <p>Pick up in {site.location.city}. We share the pickup details when we confirm your order.</p>
         </li>
-        <li>
-          <Icon name="truck" size={28} stroke={1.4} />
+        <li class="tile">
           <h2>Delivery</h2>
           <p>
-            Within {radiusMiles} miles. ${flatFee} up to ${flatFeeUpTo}, {percentOver}% of the total above that. Windows: {
-              windows.map((w) => w.time).join(' or ')
-            }.
+            Within {radiusMiles} miles. ${flatFee} on orders up to ${flatFeeUpTo}; above that, {percentOver}% of the
+            order total. Windows: {windows.map((w) => w.time).join(' or ')}.
           </p>
         </li>
       </ul>
@@ -99,16 +96,16 @@ const faqs = [
             <script is:inline src="https://server.fillout.com/embed/v1/" async />
           </div>
         ) : (
-          <div class="form-panel form-launch">
+          <div class="form-launch panel">
             <div>
               <p class="eyebrow">Order form</p>
               <h2>Ready? Send us your order request.</h2>
-              <p class="muted">
+              <p class="form-note">
                 Choose your items, sizes, flavors, and a pickup or delivery time. The form opens in a new tab.
               </p>
             </div>
-            <a class="btn btn-honey big" href={site.links.orderForm} target="_blank" rel="noopener" data-order-link>
-              Open the order form <Icon name="external" />
+            <a class="btn" href={orderLink().href} target="_blank" rel="noopener" data-order-link>
+              Open the order form
             </a>
           </div>
         )
@@ -123,7 +120,7 @@ const faqs = [
     </div>
   </section>
 
-  <section class="section-tight section-paper" id="price-guide">
+  <section class="section-tight" id="price-guide">
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Quick price guide</p>
@@ -134,9 +131,7 @@ const faqs = [
         {
           categories.map((c) => (
             <div class="guide-group">
-              <h3>
-                <Icon name={c.icon} size={22} stroke={1.5} /> {c.name}
-              </h3>
+              <h3>{c.name}</h3>
               <ul role="list">
                 {productsIn(c.id).map((p) => (
                   <li>
@@ -153,7 +148,7 @@ const faqs = [
     </div>
   </section>
 
-  <section class="section">
+  <section class="section-tight">
     <div class="container-narrow">
       <div class="section-head">
         <p class="eyebrow">Good to know</p>
@@ -165,7 +160,7 @@ const faqs = [
             <details open={i === 0}>
               <summary>
                 {f.q}
-                <Icon name="plus" size={20} class="faq-icon" />
+                <Icon name="plus" size={18} class="faq-icon" stroke={1.5} />
               </summary>
               <p>{f.a}</p>
             </details>
@@ -207,18 +202,17 @@ const faqs = [
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    background: var(--paper);
-    border: 1px solid rgba(138, 87, 16, 0.25);
+    background: var(--ivory);
     border-radius: 999px;
     padding: 10px 18px;
-    margin: 0;
-    font-weight: 600;
+    margin: 18px 0 0;
+    font-size: var(--step-small);
   }
   .picked[hidden] {
     display: none;
   }
   .picked :global(svg) {
-    color: var(--honey-deep);
+    color: var(--rose);
     flex: none;
   }
 
@@ -227,36 +221,28 @@ const faqs = [
   }
   .essentials {
     display: grid;
-    gap: 14px;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-  }
-  .essentials li {
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 22px 22px 18px;
-  }
-  .essentials :global(svg) {
-    color: var(--honey-deep);
-    margin-bottom: 14px;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
   }
   .essentials h2 {
-    font-size: 1.3rem;
+    font-size: var(--step-h3);
+    font-weight: 600;
     margin-bottom: 6px;
   }
   .essentials p {
     margin: 0;
-    font-size: 0.94rem;
-    color: var(--muted);
+    font-size: var(--step-small);
+    color: var(--mauve);
+    line-height: 1.55;
   }
 
   .form-section {
     padding-top: 0;
   }
   .form-panel {
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-l);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     padding: clamp(16px, 3vw, 32px);
   }
   .form-launch {
@@ -265,34 +251,20 @@ const faqs = [
     align-items: center;
     justify-content: space-between;
     gap: 24px 40px;
-    padding: clamp(28px, 4vw, 52px);
-    background-color: var(--espresso);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='97' viewBox='0 0 56 97'%3E%3Cpath d='M28 0l28 16.2v32.3L28 64.7 0 48.5V16.2zM28 64.7v32.3' fill='none' stroke='%23d9962c' stroke-opacity='.08' stroke-width='1.2'/%3E%3C/svg%3E");
-    background-size: 56px 97px;
-    border-color: transparent;
   }
   .form-launch h2 {
-    color: var(--on-dark);
-    max-width: 20ch;
-    margin-bottom: 10px;
+    max-width: 22ch;
+    margin-bottom: 8px;
   }
-  .form-launch .eyebrow {
-    color: var(--honey);
-  }
-  .form-launch .muted {
-    color: var(--on-dark-muted);
+  .form-note {
     margin: 0;
     max-width: 46ch;
-  }
-  .btn.big {
-    min-height: 58px;
-    padding: 0 30px;
-    font-size: 1.02rem;
+    font-size: var(--step-body-small);
   }
   .help {
     margin: 18px 4px 0;
-    color: var(--muted);
-    font-size: 0.95rem;
+    color: var(--mauve);
+    font-size: var(--step-small);
   }
 
   .guide {
@@ -301,59 +273,60 @@ const faqs = [
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
   }
   .guide-group h3 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.2rem;
+    font-family: var(--font-body);
+    font-size: var(--step-micro);
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--mauve);
     padding-bottom: 10px;
-    border-bottom: 1.5px solid var(--ink);
-    margin: 0 0 6px;
-  }
-  .guide-group h3 :global(svg) {
-    color: var(--honey-deep);
+    border-bottom: 1px solid var(--cocoa);
+    margin: 0 0 4px;
   }
   .guide-group li {
     display: flex;
     align-items: baseline;
     gap: 8px;
     padding: 9px 0;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--border);
+    font-size: var(--step-body-small);
   }
   .guide-group a {
     text-decoration: none;
-    font-weight: 600;
-    color: var(--ink);
+    color: var(--cocoa);
   }
   .guide-group a:hover {
-    color: var(--honey-deep);
+    color: var(--rose-text);
     text-decoration: underline;
   }
   .dots {
     flex: 1;
-    border-bottom: 1.5px dotted var(--line-strong);
+    border-bottom: 1px dotted var(--dashed);
     transform: translateY(-4px);
     min-width: 12px;
   }
   .guide-price {
     font-family: var(--font-display);
-    font-weight: 540;
+    font-weight: 600;
+    font-size: 1.05rem;
     white-space: nowrap;
   }
 
   .faq details {
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--border);
   }
   .faq details:first-of-type {
-    border-top: 1px solid var(--line);
+    border-top: 1px solid var(--border);
   }
   .faq summary {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 16px;
-    padding: 18px 0;
-    font-weight: 700;
-    font-size: 1.05rem;
+    padding: 16px 0;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
     cursor: pointer;
     list-style: none;
   }
@@ -362,18 +335,19 @@ const faqs = [
   }
   .faq summary :global(.faq-icon) {
     flex: none;
-    color: var(--honey-deep);
+    color: var(--rose);
     transition: transform 0.25s var(--ease);
   }
   .faq details[open] summary :global(.faq-icon) {
     transform: rotate(45deg);
   }
   .faq details p {
-    margin: 0 0 18px;
-    color: var(--ink-2);
+    margin: 0 0 16px;
+    font-size: var(--step-body-small);
   }
   .more {
-    margin-top: 26px;
-    color: var(--muted);
+    margin-top: 24px;
+    color: var(--mauve);
+    font-size: var(--step-small);
   }
 </style>

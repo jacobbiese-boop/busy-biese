@@ -1,11 +1,13 @@
 ---
-import '@fontsource-variable/fraunces/standard.css';
-import '@fontsource-variable/fraunces/standard-italic.css';
-import '@fontsource-variable/manrope/wght.css';
+import '@fontsource/parisienne/latin-400.css';
+import '@fontsource-variable/cormorant-garamond/wght.css';
+import '@fontsource-variable/cormorant-garamond/wght-italic.css';
+import '@fontsource-variable/jost/wght.css';
 import '../styles/global.css';
 
-import frauncesUrl from '@fontsource-variable/fraunces/files/fraunces-latin-standard-normal.woff2?url';
-import manropeUrl from '@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2?url';
+import parisienneUrl from '@fontsource/parisienne/files/parisienne-latin-400-normal.woff2?url';
+import cormorantUrl from '@fontsource-variable/cormorant-garamond/files/cormorant-garamond-latin-wght-normal.woff2?url';
+import jostUrl from '@fontsource-variable/jost/files/jost-latin-wght-normal.woff2?url';
 
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -54,10 +56,11 @@ const ga4 = site.analytics.ga4;
     <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#F6EFE5" />
+    <meta name="theme-color" content="#FBF7F2" />
 
-    <link rel="preload" href={frauncesUrl} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={manropeUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={jostUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={cormorantUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={parisienneUrl} as="font" type="font/woff2" crossorigin />
 
     <meta property="og:site_name" content="Busy Biese" />
     <meta property="og:type" content={ogType === 'product' ? 'product' : 'website'} />

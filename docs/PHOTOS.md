@@ -1,44 +1,40 @@
 # Photos
 
-The site looks for photos here by name. Each photo has three files:
+The site looks for photos in `public/photos` by name. Each photo has one or two files:
 
-- `<name>-800.webp` (cards and thumbnails)
-- `<name>-1600.webp` (large views)
-- `<name>-og.jpg` (1200 x 630 preview when a page is shared)
+- `<name>-800.webp` (tiles, cards and thumbnails; always)
+- `<name>-1400.webp` (large views; optional)
 
-Run `python3 scripts/import_photos.py` to create them from original photos
-(see the top of that script; photos go in public/photos). Until a photo exists, the site shows a
-honeycomb placeholder, so nothing breaks.
+Run `python3 scripts/import_photos.py --file photo.HEIC --name some-name` to add one
+(see the top of that script). Until a photo exists, the site shows a dusty pink panel with
+a small bee, so nothing breaks.
 
-## Photo names used on the site
+Photos are shown without captions. The `alt` text in `gallery` (src/data/menu.ts) is read
+only by screen readers and search engines.
 
-| Name | What it should show | Used on |
+## Photos on the site today
+
+| Name | What it shows | Used on |
 | --- | --- | --- |
-| cinnamon-rolls | A pan of frosted cinnamon rolls | Home hero, Cinnamon Rolls |
-| cheesecake-strawberry | Strawberry mini cheesecakes | Home hero, Mini Cheesecakes |
-| cheesecake-oreo | Oreo mini cheesecakes | Mini Cheesecakes, gallery |
-| cheesecake-biscoff | Biscoff mini cheesecakes | Mini Cheesecakes, gallery |
-| packaging | Branded Busy Biese packaging | Several items, About |
-| cookie-brown-butter | Brown butter chocolate chip cookie | Home hero, Cookies |
-| cookie-box | A box of cookies | Cookies |
-| cookie-smores | S'mores cookie close-up | S'mores Cookies |
-| smores-batch | A batch of s'mores cookies | S'mores Cookies, gallery |
-| brownies-nutella | Nutella brownies | Nutella Brownies |
-| cake-pops | Gold-leaf cake pops | Cake Pops |
-| baklava-rose | Baklava with rose garnish | Baklava, About |
-| baklava-variety | Baklava assortment | Baklava |
-| dates-assorted-box | Assorted date gift box | Assorted Date Box, About |
-| dates-small-box | Small date boxes | Date boxes |
-| dates-small-box-single | One small date box | Small Date Boxes |
-| strawberry-box | Chocolate covered strawberry box | Strawberry Box (needs a photo) |
-| latte-held | A latte in hand | Salted Maple Latte |
-| latte-rolls | Latte with cinnamon rolls | Lattes, matcha |
-| cafe-menu-board | Drinks menu board | Honey Bee Latte |
-| latte-matcha | Iced latte and matcha | Matcha drinks |
-| cold-cut-sub-cut | Cold cut sub, cut | Sandwiches |
-| cold-cut-sub-whole | Cold cut sub, whole | Sandwiches |
-| slider-tray | Slider gathering tray | Slider Tray, Home, Catering |
-| cheese-danishes | Cheese danishes | Home gallery |
-| pumpkin-muffins | Pumpkin muffins | Home gallery |
-| apple-pie | Apple pie | Home gallery |
-| matcha-cookies | Matcha cookies | Home gallery |
+| cinnamon-rolls | Frosted cinnamon rolls in a baking dish | Gallery, Cinnamon Rolls |
+| cinnamon-rolls-trays | Three trays of baked rolls | Gallery, Cinnamon Rolls |
+| cookie-brown-butter | Chocolate chip cookies on a rack with flaky salt | Gallery, Brown Butter Cookies |
+| cookie-smores | S'mores cookie held up, marshmallow center | Gallery, S'mores Cookies |
+| smores-batch | S'mores cookies on a rack | Gallery, S'mores Cookies |
+| baklava-rose | Baklava tray with pistachio and rose | Gallery, Baklava |
+| dates-small-box | Small date gift boxes with gold cord | Gallery, Small Date Boxes |
+| cheesecake-oreo | Oreo cheesecakes in pink tins (crop of the market table) | Mini Cheesecakes |
+| market-table | Event table of packaged desserts | Gallery, Catering |
+| market-table-sign | Event table with the menu sign | Gallery |
+| muffins, muffins-window | Cream cheese muffins | Gallery |
+| catering-trays | Two large dessert trays | Home, Catering, Gallery |
+| dessert-box | Box of mini dessert cups | Home, Catering, Gallery |
+| cake-new-chapter, cake-new-chapter-2 | Celebration cake with ribbon bows | About, Gallery |
+| cake-bride, cake-bride-table | Bride to Be cake | Gallery |
+| dessert-jars | Dessert jars with pink frosting | Gallery |
+
+## Still needed (placeholder shown until added)
+
+Nutella brownies, strawberry mini cheesecakes, Biscoff mini cheesecakes, cake pops,
+assorted date box, chocolate covered strawberry box, slider tray, cold cut subs (cut and
+whole), lattes and matcha drinks. Add each with the name listed in `scripts/photo-map.json`.

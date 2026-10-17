@@ -1,0 +1,69 @@
+---
+/**
+ * The Busy Biese bee mark (Visual System 1.0).
+ *
+ * A single-weight line bee, tilted 32 degrees to the left. Three variants:
+ *   line    the primary mark (outline only)
+ *   solid   body and head filled, pale stripes; use below 24px or for emphasis
+ *   motion  the line bee with a dotted loop trail; hero only, never below 48px
+ *
+ * Color comes from `color` (any CSS color, defaults to the text color), so the
+ * same component gives cocoa on pink, rose on white, ivory on rose and pink on
+ * cocoa. Keep it on an ivory or pink panel, never straight on a photo.
+ */
+interface Props {
+  variant?: 'line' | 'solid' | 'motion';
+  /** Rendered height in px (the mark is square). */
+  size?: number;
+  color?: string;
+  /** Stripe color for the solid variant. */
+  stripe?: string;
+  /** Accessible name. Leave out for decorative use. */
+  label?: string;
+  class?: string;
+}
+
+const { variant = 'line', size = 32, color = 'currentColor', stripe = 'var(--pink)', label, class: className } = Astro.props;
+
+const motion = variant === 'motion';
+const solid = variant === 'solid';
+const viewBox = motion ? '-19 -5 234 234' : '-25.5 6.5 190 190';
+
+const body = 'M100 96C120 96 124 126 121 150C118 176 108 190 100 196C92 190 82 176 79 150C76 126 80 96 100 96Z';
+const wingL = 'M92 90C74 60 20 34 12 60C8 86 66 96 92 90Z';
+const wingR = 'M108 90C126 60 180 34 188 60C192 86 134 96 108 90Z';
+// The three stripes, pre-trimmed to the body outline so no clipPath is needed.
+const stripes = 'M78.2 131.2Q100 136.8 121.8 131.2M79.8 155.6Q100 160.4 120.2 155.6M88 181.1Q100 182.9 112 181.1';
+const trail = 'M100 206C104 224 116 240 134 236C150 232 146 212 132 216C118 220 126 244 150 250';
+---
+
+<svg
+  class:list={['bee', `bee-${variant}`, className]}
+  width={size}
+  height={size}
+  viewBox={viewBox}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"
+  style={`color:${color}`}
+>
+  <g transform="rotate(-32 100 120)" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d={wingL}></path>
+    <path d={wingR}></path>
+    <path d={body} fill={solid ? 'currentColor' : 'none'}></path>
+    <path d={stripes} stroke-width="4" stroke-linecap="butt" stroke={solid ? stripe : 'currentColor'}></path>
+    <circle cx="100" cy="74" r="9" fill={solid ? 'currentColor' : 'none'}></circle>
+    <path d="M96 64Q93 57 88 54"></path>
+    <path d="M104 64Q107 57 112 54"></path>
+    {motion && <path d={trail} stroke-width="4" stroke-dasharray="1 8"></path>}
+  </g>
+</svg>
+
+<style>
+  .bee {
+    display: inline-block;
+    vertical-align: middle;
+    flex: none;
+  }
+</style>

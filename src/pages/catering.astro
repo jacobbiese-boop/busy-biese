@@ -1,11 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
-import ProductCard from '../components/ProductCard.astro';
-import Icon from '../components/Icon.astro';
+import ProductList from '../components/ProductList.astro';
+import Photo from '../components/Photo.astro';
 import { site } from '../config/site';
 import { products, productsIn, getProduct } from '../data/menu';
 import { money, each } from '../lib/format';
+import { orderLink } from '../lib/order';
 import { breadcrumbJsonLd } from '../lib/seo';
 
 const savory = productsIn('sandwiches');
@@ -25,6 +26,7 @@ const dessertTrays = products
   .filter((x): x is NonNullable<typeof x> => x !== null);
 
 const { radiusMiles, windows } = site.delivery;
+const order = orderLink();
 ---
 
 <Base
@@ -42,14 +44,28 @@ const { radiusMiles, windows } = site.delivery;
     eyebrow="Catering & large orders"
     title="Feed the whole room, <em>beautifully</em>"
     lead={`Halal cold cut slider trays and boxed lunches for meetings and events, plus dessert trays to round it out. Pickup in ${site.location.city} or delivery within ${radiusMiles} miles.`}
+    tone="pink"
   >
     <div class="btn-row">
-      <a class="btn" href="/order/">Start a catering order <Icon name="arrow" class="arrow" /></a>
-      <a class="btn btn-outline" href={site.links.whatsapp} target="_blank" rel="noopener">
-        <Icon name="chat" /> Ask about a custom quote
-      </a>
+      <a
+        class="btn"
+        href={order.href}
+        target={order.external ? '_blank' : undefined}
+        rel={order.external ? 'noopener' : undefined}>Start a catering order</a
+      >
+      <a class="btn btn-outline" href={site.links.whatsapp} target="_blank" rel="noopener">Ask about a custom quote</a>
     </div>
   </PageHero>
+
+  <section class="section-tight">
+    <div class="container">
+      <ul class="cater-gallery" role="list">
+        <li><Photo name="catering-trays" alt="Two catering trays of dessert with pistachio and rose petals" ratio="4 / 5" sizes="(min-width: 900px) 33vw, 100vw" eager /></li>
+        <li><Photo name="dessert-box" alt="A box of mini dessert cups for a party" ratio="4 / 5" sizes="(min-width: 900px) 33vw, 50vw" /></li>
+        <li><Photo name="market-table" alt="A table of packaged desserts set up for an event" ratio="4 / 5" sizes="(min-width: 900px) 33vw, 50vw" /></li>
+      </ul>
+    </div>
+  </section>
 
   <section class="section-tight">
     <div class="container">
@@ -58,61 +74,61 @@ const { radiusMiles, windows } = site.delivery;
         <h2>Sandwiches &amp; trays</h2>
         <p>Every cold cut we serve is 100% halal-certified.</p>
       </div>
-      <div class="grid grid-3">
-        {savory.map((p) => <ProductCard product={p} showCategory={false} />)}
+      <ProductList products={savory} />
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="guide panel split">
+        <div>
+          <p class="eyebrow">Serving guide</p>
+          <h2>How many sliders do I need?</h2>
+          <p>Plan on about two sliders per person. Here is how our trays usually stretch.</p>
+          {
+            boutiqueTier && boutiqueTier.qty && (
+              <p>
+                For small teams, the Boutique Box brings {boutiqueTier.qty} full meals (sub, chips, and pickle) for{' '}
+                {money(boutiqueTier.price)}, which works out to {money(boutiqueTier.price / boutiqueTier.qty)} a person.
+              </p>
+            )
+          }
+        </div>
+        <div class="guide-card">
+          <table>
+            <caption class="visually-hidden">Slider tray serving guide</caption>
+            <thead>
+              <tr>
+                <th scope="col">Tray</th>
+                <th scope="col">Serves about</th>
+                <th scope="col">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                sliders?.tiers.map((t) => (
+                  <tr>
+                    <th scope="row">{t.label}</th>
+                    <td>{t.serves ?? ''}</td>
+                    <td>{money(t.price)}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+          {
+            sliders?.addOns && (
+              <p class="guide-foot">
+                Add-ons: {sliders.addOns.map((a) => `${a.label.toLowerCase()} ${money(a.price)}${a.note ? ' ' + a.note : ''}`).join(', ')}.
+              </p>
+            )
+          }
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="section section-dark">
-    <div class="container split">
-      <div>
-        <p class="eyebrow">Serving guide</p>
-        <h2>How many sliders do I need?</h2>
-        <p>Plan on about two sliders per person. Here is how our trays usually stretch.</p>
-        {
-          boutiqueTier && boutiqueTier.qty && (
-            <p>
-              For small teams, the Boutique Box brings {boutiqueTier.qty} full meals (sub, chips, and pickle) for{' '}
-              {money(boutiqueTier.price)}, which works out to {money(boutiqueTier.price / boutiqueTier.qty)} a person.
-            </p>
-          )
-        }
-      </div>
-      <div class="guide-card">
-        <table>
-          <caption class="visually-hidden">Slider tray serving guide</caption>
-          <thead>
-            <tr>
-              <th scope="col">Tray</th>
-              <th scope="col">Serves about</th>
-              <th scope="col">Price</th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              sliders?.tiers.map((t) => (
-                <tr>
-                  <th scope="row">{t.label}</th>
-                  <td>{t.serves ?? ''}</td>
-                  <td>{money(t.price)}</td>
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
-        {
-          sliders?.addOns && (
-            <p class="guide-foot">
-              Add-ons: {sliders.addOns.map((a) => `${a.label.toLowerCase()} ${money(a.price)}${a.note ? ' ' + a.note : ''}`).join(', ')}.
-            </p>
-          )
-        }
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
+  <section class="section-tight">
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Sweet</p>
@@ -138,37 +154,33 @@ const { radiusMiles, windows } = site.delivery;
     </div>
   </section>
 
-  <section class="section-tight section-oat">
+  <section class="section-tight">
     <div class="container">
       <div class="section-head">
         <p class="eyebrow">Planning tips</p>
         <h2>For a smooth event</h2>
       </div>
       <div class="grid grid-4 tips">
-        <article>
-          <Icon name="calendar" size={28} stroke={1.4} />
+        <article class="tile">
           <h3>Book early</h3>
           <p>
             We need {site.ordering.noticeHours} hours for most orders. For 48 sliders or more, a week ahead is best.
           </p>
         </article>
-        <article>
-          <Icon name="box" size={28} stroke={1.4} />
+        <article class="tile">
           <h3>Going big?</h3>
           <p>
             For orders beyond our largest trays, or about {site.ordering.largeOrderPieces} pieces or more, we will put
             together a custom quote.
           </p>
         </article>
-        <article>
-          <Icon name="truck" size={28} stroke={1.4} />
+        <article class="tile">
           <h3>Delivery windows</h3>
           <p>
             We deliver within {radiusMiles} miles in two windows: {windows.map((w) => `${w.label.toLowerCase()} (${w.time})`).join(' and ')}.
           </p>
         </article>
-        <article>
-          <Icon name="check-badge" size={28} stroke={1.4} />
+        <article class="tile">
           <h3>Halal, always</h3>
           <p>All of our cold cuts are 100% halal-certified, so everyone at the table can dig in.</p>
         </article>
@@ -178,14 +190,19 @@ const { radiusMiles, windows } = site.delivery;
 
   <section class="section-tight">
     <div class="container">
-      <div class="cta-band">
+      <div class="cta-band panel">
         <div>
           <h2>Tell us about your event.</h2>
           <p>Share your date, headcount, and what you have in mind. We will confirm the details and timing with you.</p>
         </div>
         <div class="btn-row">
-          <a class="btn btn-honey" href="/order/">Start an order <Icon name="arrow" class="arrow" /></a>
-          <a class="btn btn-ghost-dark" href={site.links.whatsapp} target="_blank" rel="noopener">Message us</a>
+          <a
+            class="btn"
+            href={order.href}
+            target={order.external ? '_blank' : undefined}
+            rel={order.external ? 'noopener' : undefined}>Start an order</a
+          >
+          <a class="btn btn-outline" href={site.links.whatsapp} target="_blank" rel="noopener">Message us</a>
         </div>
       </div>
     </div>
@@ -193,118 +210,141 @@ const { radiusMiles, windows } = site.delivery;
 </Base>
 
 <style>
+  .cater-gallery {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .cater-gallery :global(.photo) {
+    border-radius: var(--radius-s);
+  }
+  @media (max-width: 699px) {
+    .cater-gallery {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .cater-gallery li:first-child {
+      grid-column: span 2;
+    }
+    .cater-gallery li:first-child :global(.photo) {
+      aspect-ratio: 4 / 3 !important;
+    }
+  }
+
+  .guide {
+    align-items: center;
+  }
+  .guide p {
+    font-size: var(--step-body-small);
+  }
   .guide-card {
-    background: var(--espresso-2);
-    border: 1px solid rgba(246, 239, 229, 0.14);
-    border-radius: var(--radius-l);
-    padding: clamp(18px, 3vw, 30px);
+    background: var(--ivory);
+    border-radius: var(--radius-s);
+    padding: clamp(18px, 3vw, 28px);
   }
   .guide-card table {
     width: 100%;
     border-collapse: collapse;
+    font-size: var(--step-body-small);
   }
   .guide-card th,
   .guide-card td {
     text-align: left;
-    padding: 14px 8px;
-    border-bottom: 1px solid rgba(246, 239, 229, 0.14);
-    color: var(--on-dark);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
   }
   .guide-card thead th {
-    font-size: var(--step-tiny);
-    font-weight: 750;
-    letter-spacing: 0.14em;
+    font-size: var(--step-micro);
+    letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: var(--honey);
+    font-weight: 400;
+    color: var(--mauve);
   }
   .guide-card tbody th {
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    font-weight: 520;
+    font-weight: 400;
   }
   .guide-card td:last-child {
     font-family: var(--font-display);
     font-size: 1.15rem;
+    font-weight: 600;
+  }
+  .guide-card tbody tr:last-child th,
+  .guide-card tbody tr:last-child td {
+    border-bottom: 0;
   }
   .guide-foot {
-    margin: 16px 8px 0;
-    font-size: 0.92rem;
+    margin: 14px 0 0;
+    font-size: var(--step-small);
+    color: var(--mauve);
   }
 
   .trays {
     display: grid;
-    gap: 12px;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
   }
   .trays a {
     display: grid;
     grid-template-columns: 1fr auto;
-    grid-template-areas:
-      'name price'
-      'size price';
     gap: 2px 16px;
-    align-items: center;
-    padding: 18px 20px;
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+    padding: 16px 18px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
     text-decoration: none;
-    color: var(--ink);
+    color: var(--cocoa);
     transition:
-      border-color 0.2s var(--ease),
-      transform 0.2s var(--ease);
+      background-color 0.25s var(--ease),
+      border-color 0.25s var(--ease);
   }
   .trays a:hover {
-    border-color: rgba(138, 87, 16, 0.4);
-    transform: translateY(-2px);
-    color: var(--ink);
+    background: var(--pink-matte);
+    border-color: var(--pink-matte);
+    text-decoration: none;
   }
   .tray-name {
-    grid-area: name;
     font-family: var(--font-display);
-    font-size: 1.15rem;
-    font-weight: 540;
-    line-height: 1.25;
+    font-size: var(--step-h3);
+    font-weight: 600;
+    line-height: 1.2;
   }
   .tray-size {
-    grid-area: size;
-    font-size: 0.9rem;
-    color: var(--muted);
-    font-weight: 600;
+    grid-column: 1;
+    font-size: var(--step-small);
+    color: var(--mauve);
+  }
+  .trays a:hover .tray-size {
+    color: var(--cocoa);
   }
   .tray-price {
-    grid-area: price;
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
     text-align: right;
     font-family: var(--font-display);
-    font-size: 1.35rem;
-    font-weight: 560;
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1.1;
   }
   .tray-price small {
     display: block;
     font-family: var(--font-body);
-    font-size: 0.78rem;
-    color: var(--muted);
-    font-weight: 600;
+    font-size: var(--step-tiny);
+    font-weight: 300;
+    color: var(--mauve);
+    margin-top: 2px;
+  }
+  .trays a:hover .tray-price small {
+    color: var(--cocoa);
   }
 
-  .tips article {
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 24px 22px 20px;
-  }
-  .tips :global(svg) {
-    color: var(--honey-deep);
-    margin-bottom: 14px;
-  }
   .tips h3 {
-    font-size: 1.25rem;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
   .tips p {
     margin: 0;
-    color: var(--muted);
-    font-size: 0.95rem;
+    font-size: var(--step-small);
+    color: var(--mauve);
+    line-height: 1.55;
   }
 
   .cta-band {
@@ -312,18 +352,14 @@ const { radiusMiles, windows } = site.delivery;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 20px 40px;
-    padding: clamp(28px, 4vw, 48px);
-    border-radius: var(--radius-l);
-    background: var(--espresso);
-    color: var(--on-dark-muted);
+    gap: 24px 40px;
   }
   .cta-band h2 {
-    color: var(--on-dark);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
   .cta-band p {
     margin: 0;
-    max-width: 52ch;
+    max-width: 48ch;
+    font-size: var(--step-body-small);
   }
 </style>
