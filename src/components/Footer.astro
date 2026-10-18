@@ -139,6 +139,10 @@ const webHost = 'busybiese.com';
   .footer-info a {
     color: var(--pink-matte);
     align-self: flex-start;
+    /* comfortable tap target (24px or more) without changing the look */
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
   }
 
   .footer-head {

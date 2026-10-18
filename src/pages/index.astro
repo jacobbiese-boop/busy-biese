@@ -41,8 +41,8 @@ const hasGallery = gallery.some((g) => hasPhoto(g.photo));
             <a class="btn btn-outline" href="/menu/">See the menu</a>
           </div>
         </div>
-        <div class="hero-bee">
-          <Bee variant="motion" size={220} class="hero-bee-svg" />
+        <div class="hero-bee" data-hero-bee>
+          <Bee variant="motion" size={220} class="hero-bee-svg bee-arrive bee-flying bee-flutter" />
         </div>
       </div>
     </div>
@@ -230,6 +230,42 @@ const hasGallery = gallery.some((g) => hasPhoto(g.photo));
   </section>
 </Base>
 
+<script>
+  // The hero bee: leans toward the cursor and does a loop when tapped.
+  const wrap = document.querySelector<HTMLElement>('[data-hero-bee]');
+  const bee = wrap?.querySelector<SVGSVGElement>('svg');
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (wrap && bee && !calm.matches) {
+    const hero = wrap.closest<HTMLElement>('.hero');
+    if (hero && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      let frame = 0;
+      hero.addEventListener('pointermove', (e) => {
+        const r = wrap.getBoundingClientRect();
+        const mx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (r.width * 1.6)));
+        const my = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / (r.height * 1.6)));
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(() => {
+          wrap.style.setProperty('--mx', mx.toFixed(3));
+          wrap.style.setProperty('--my', my.toFixed(3));
+        });
+      });
+      hero.addEventListener('pointerleave', () => {
+        cancelAnimationFrame(frame);
+        wrap.style.setProperty('--mx', '0');
+        wrap.style.setProperty('--my', '0');
+      });
+    }
+    bee.addEventListener('click', () => {
+      if (bee.classList.contains('bee-loop')) return;
+      bee.classList.remove('bee-arrive');
+      bee.classList.add('bee-loop');
+    });
+    bee.addEventListener('animationend', (e) => {
+      if (e.animationName === 'bee-loop') bee.classList.remove('bee-loop');
+    });
+  }
+</script>
+
 <style>
   .hero-wrap {
     padding-top: clamp(16px, 2.5vw, 28px);
@@ -269,10 +305,20 @@ const hasGallery = gallery.some((g) => hasPhoto(g.photo));
     display: flex;
     justify-content: center;
     align-items: center;
+    /* Leans a little toward the cursor (set by the script below) */
+    transform: translate3d(calc(var(--mx, 0) * 16px), calc(var(--my, 0) * 12px), 0) rotate(calc(var(--mx, 0) * 7deg));
+    transition: transform 0.7s var(--ease);
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .hero-bee :global(.hero-bee-svg) {
+      cursor: pointer;
+    }
   }
   .hero-bee :global(.hero-bee-svg) {
     width: clamp(110px, 20vw, 220px);
     height: auto;
+    overflow: visible; /* room for the loop */
     animation: float 7s ease-in-out infinite;
   }
   @keyframes float {

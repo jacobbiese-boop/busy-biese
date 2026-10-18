@@ -75,19 +75,20 @@ export const site: SiteConfig = {
   ],
 
   links: {
-    /** The live order form. Every "Order" button points here. */
-    orderForm: 'https://intakeforms.fillout.com/BusyBieseBakery',
+    /** The order form on its own page (used for the open-in-a-new-tab link). */
+    orderForm: 'https://intakeforms.fillout.com/busybiese',
     instagram: 'https://instagram.com/busybiesebakery',
     instagramHandle: '@busybiesebakery',
     whatsapp: 'https://chat.whatsapp.com/Fv2PSFwW67e4rbtw3owCVp',
   },
 
   /**
-   * Fillout embed. Paste the form ID from Fillout (Share > Embed) to show the
-   * form right on the Order page. Leave it empty to show a button instead.
+   * Fillout embed: the "Busy Biese · Order request" form, shown right on the
+   * Order page. The ID comes from Fillout (Share > Embed). Leave it empty to
+   * show a button that opens the form in a new tab instead.
    */
   fillout: {
-    formId: '',
+    formId: 'ii1Y1smbD3us',
   },
 
   /** Leave blank to hide. Add once the business email or phone is set up. */

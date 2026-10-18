@@ -6,7 +6,7 @@
  */
 import type { Product } from '../data/menu';
 import { priceLabel } from '../lib/format';
-import { orderLink } from '../lib/order';
+import { formItem, orderLink } from '../lib/order';
 import Icon from './Icon.astro';
 
 interface Props {
@@ -25,7 +25,7 @@ const { products, describe = true, details = true, columns = 3, class: className
 <ul class:list={['plist', `plist-${columns}`, className]} role="list">
   {
     products.map((p) => {
-      const link = orderLink(p.name);
+      const link = orderLink({ type: 'Menu items', item: formItem(p) });
       const minShort = p.minimum?.replace(/\. .*$/, '');
       return (
         <li class="plist-item">

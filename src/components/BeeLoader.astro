@@ -1,0 +1,65 @@
+---
+/**
+ * A small bee flying a dotted loop, for loading states (the order form, the
+ * photo viewer). Decorative: pair it with visible or screen-reader text.
+ */
+import Bee from './Bee.astro';
+
+interface Props {
+  /** Outer size in px. */
+  size?: number;
+  class?: string;
+}
+
+const { size = 88, class: className } = Astro.props;
+const beeSize = Math.round(size * 0.42);
+---
+
+<span class:list={['bee-loader', className]} style={`--loader:${size}px; --loader-bee:${beeSize}px`} aria-hidden="true">
+  <svg class="bee-loader-ring" viewBox="0 0 100 100" focusable="false">
+    <circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.6 6.4" pathLength="100"></circle>
+  </svg>
+  <span class="bee-loader-orbit">
+    <Bee size={beeSize} color="var(--loader-bee-color, var(--cocoa))" class="bee-loader-bee bee-buzz bee-bold" />
+  </span>
+</span>
+
+<style>
+  .bee-loader {
+    position: relative;
+    display: inline-block;
+    width: var(--loader);
+    height: var(--loader);
+    color: var(--rose);
+  }
+  .bee-loader-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .bee-loader-orbit {
+    position: absolute;
+    inset: 0;
+    animation: bee-orbit 2.2s linear infinite;
+  }
+  .bee-loader-orbit :global(.bee-loader-bee) {
+    position: absolute;
+    left: 50%;
+    top: 12%;
+    width: var(--loader-bee);
+    height: var(--loader-bee);
+    /* Head pointing along the loop (the mark is drawn tilted 32 degrees left). */
+    transform: translate(-50%, -50%) rotate(122deg);
+  }
+  @keyframes bee-orbit {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bee-loader-orbit {
+      animation: none;
+    }
+  }
+</style>

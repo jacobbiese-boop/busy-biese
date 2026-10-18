@@ -7,7 +7,7 @@ import { products, getCategory, relatedProducts, type Product } from '../../data
 import { site } from '../../config/site';
 import { availablePhotos, photoUrl, photoSrcset } from '../../lib/photos';
 import { money, each, perItem, priceLabel, bestPerItem, sentenceList } from '../../lib/format';
-import { orderLink } from '../../lib/order';
+import { formItem, orderLink } from '../../lib/order';
 import { productJsonLd, breadcrumbJsonLd, faqJsonLd } from '../../lib/seo';
 
 export function getStaticPaths() {
@@ -25,7 +25,7 @@ const related = relatedProducts(product, 3);
 const best = bestPerItem(product);
 const showEach = product.tiers.some((t) => perItem(t) !== undefined);
 const servingGuide = product.tiers.filter((t) => t.serves);
-const order = orderLink(product.name);
+const order = orderLink({ type: 'Menu items', item: formItem(product) });
 const description = `${product.short} ${priceLabel(product)}. Made to order in ${site.location.city}, IL.`;
 
 const ld = [
@@ -109,17 +109,29 @@ const ld = [
                 <th scope="col">Size</th>
                 <th scope="col">Price</th>
                 {showEach && <th scope="col">Each</th>}
+                <th scope="col"><span class="visually-hidden">Order</span></th>
               </tr>
             </thead>
             <tbody>
               {
                 product.tiers.map((t) => {
                   const unit = perItem(t);
+                  const tierOrder = orderLink({ type: 'Menu items', item: formItem(product, t) });
                   return (
                     <tr>
                       <th scope="row">{t.label}</th>
                       <td>{money(t.price)}</td>
                       {showEach && <td class="each">{unit ? each(unit) : ''}</td>}
+                      <td class="tier-go">
+                        <a
+                          class="tier-order"
+                          href={tierOrder.href}
+                          target={tierOrder.external ? '_blank' : undefined}
+                          rel={tierOrder.external ? 'noopener' : undefined}
+                        >
+                          Order<span class="visually-hidden"> {t.label}</span>
+                        </a>
+                      </td>
                     </tr>
                   );
                 })
@@ -495,6 +507,39 @@ const ld = [
     font-weight: 300;
     font-size: var(--step-small);
     color: var(--mauve);
+  }
+  .tiers td.tier-go {
+    text-align: right;
+    padding-left: 10px;
+    white-space: nowrap;
+    width: 1%;
+  }
+  .tier-order {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 0 14px;
+    border: 1px solid var(--cocoa);
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: var(--step-micro);
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--cocoa);
+    transition:
+      background-color 0.2s var(--ease),
+      color 0.2s var(--ease),
+      transform 0.2s var(--ease);
+  }
+  .tier-order:hover {
+    background: var(--cocoa);
+    color: var(--ivory);
+    text-decoration: none;
+  }
+  .tier-order:active {
+    transform: scale(0.97);
   }
 
   .option-group {

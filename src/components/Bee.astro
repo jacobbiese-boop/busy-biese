@@ -35,6 +35,8 @@ const wingR = 'M108 90C126 60 180 34 188 60C192 86 134 96 108 90Z';
 // The three stripes, pre-trimmed to the body outline so no clipPath is needed.
 const stripes = 'M78.2 131.2Q100 136.8 121.8 131.2M79.8 155.6Q100 160.4 120.2 155.6M88 181.1Q100 182.9 112 181.1';
 const trail = 'M100 206C104 224 116 240 134 236C150 232 146 212 132 216C118 220 126 244 150 250';
+// Unique per instance, for the trail's reveal mask (motion variant only).
+const maskId = `bee-trail-${Math.random().toString(36).slice(2, 9)}`;
 ---
 
 <svg
@@ -48,15 +50,34 @@ const trail = 'M100 206C104 224 116 240 134 236C150 232 146 212 132 216C118 220 
   focusable="false"
   style={`color:${color}`}
 >
+  {
+    motion && (
+      <defs>
+        <mask id={maskId} maskUnits="userSpaceOnUse" x="-100" y="-100" width="400" height="400">
+          <path
+            class="bee-trail-reveal"
+            d={trail}
+            fill="none"
+            stroke="#fff"
+            stroke-width="12"
+            stroke-linecap="round"
+            pathLength="1"
+          />
+        </mask>
+      </defs>
+    )
+  }
   <g transform="rotate(-32 100 120)" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-    <path d={wingL}></path>
-    <path d={wingR}></path>
-    <path d={body} fill={solid ? 'currentColor' : 'none'}></path>
-    <path d={stripes} stroke-width="4" stroke-linecap="butt" stroke={solid ? stripe : 'currentColor'}></path>
-    <circle cx="100" cy="74" r="9" fill={solid ? 'currentColor' : 'none'}></circle>
-    <path d="M96 64Q93 57 88 54"></path>
-    <path d="M104 64Q107 57 112 54"></path>
-    {motion && <path d={trail} stroke-width="4" stroke-dasharray="1 8"></path>}
+    {motion && <path class="bee-trail" d={trail} stroke-width="4" stroke-dasharray="1 8" mask={`url(#${maskId})`} />}
+    <g class="bee-fly">
+      <path class="bee-wing bee-wing-l" d={wingL}></path>
+      <path class="bee-wing bee-wing-r" d={wingR}></path>
+      <path d={body} fill={solid ? 'currentColor' : 'none'}></path>
+      <path class="bee-stripes" d={stripes} stroke-width="4" stroke-linecap="butt" stroke={solid ? stripe : 'currentColor'}></path>
+      <circle cx="100" cy="74" r="9" fill={solid ? 'currentColor' : 'none'}></circle>
+      <path d="M96 64Q93 57 88 54"></path>
+      <path d="M104 64Q107 57 112 54"></path>
+    </g>
   </g>
 </svg>
 

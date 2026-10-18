@@ -7,8 +7,9 @@ Parisienne wordmark (Visual System 1.0).
   public/brand/logo.svg          lockup, cocoa (text converted to outlines)
   public/brand/logo-light.svg    lockup, pink (for cocoa backgrounds)
   public/brand/mark-512.png      line bee, cocoa on dusty pink
-  public/favicon.svg             solid bee on a pink rounded square
-  public/favicon-32.png, apple-touch-icon.png, icon-192.png, icon-512.png
+  public/favicon.svg             line bee on a pink rounded square (browser tabs, search)
+  public/favicon.ico             16, 32 and 48 px versions with size-tuned line weights
+  public/favicon-32.png, favicon-96.png, apple-touch-icon.png, icon-192.png, icon-512.png
   public/og/busy-biese.png       1200 x 630 social share image
 
 Run from the project root after `npm install`:
@@ -19,6 +20,7 @@ from pathlib import Path
 import shutil
 import tempfile
 
+from PIL import Image
 from fontTools.ttLib import TTFont
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen
@@ -64,6 +66,33 @@ def bee_svg(color: str, size: int, solid: bool = False, motion: bool = False, bg
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="{vb}" role="img" aria-label="Busy Biese bee">'
         f"{bgrect}{bee_group(color, solid=solid, motion=motion)}</svg>"
+    )
+
+
+# The bee's visual center inside its 190-unit drawing (measured from a render).
+BEE_CX, BEE_CY = 69.9, 101.6
+
+
+def icon_svg(stroke: float, fill: float = 0.9, stripes: bool = True, radius: float = 0.22, size: int | None = None) -> str:
+    """The logo's line bee, centered on a dusty pink rounded square.
+
+    Small icons need heavier lines than the logo to stay readable, so `stroke`
+    is chosen per size: about 14 at 16 px, 11 at 32 px, 9 at 96 px and up.
+    `fill` is how much of the square the bee covers; `radius` is a share of
+    the side (0 for a square that the system rounds itself, like iOS icons).
+    """
+    side = (172 + stroke) / fill
+    x, y = BEE_CX - side / 2, BEE_CY - side / 2
+    stripe = (
+        f'<path d="{STRIPES}" stroke-width="{max(4.0, stroke * 0.78):.1f}" stroke-linecap="butt"/>' if stripes else ""
+    )
+    dims = f' width="{size}" height="{size}"' if size else ""
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg"{dims} viewBox="{x:.1f} {y:.1f} {side:.1f} {side:.1f}" role="img" aria-label="Busy Biese bee">'
+        f'<rect x="{x:.1f}" y="{y:.1f}" width="{side:.1f}" height="{side:.1f}" rx="{side * radius:.1f}" fill="{PINK}"/>'
+        f'<g transform="rotate(-32 100 120)" fill="none" stroke="{COCOA}" stroke-width="{stroke}" stroke-linecap="round" stroke-linejoin="round">'
+        f'<path d="{WING_L}"/><path d="{WING_R}"/><path d="{BODY}"/>{stripe}<circle cx="100" cy="74" r="9"/>'
+        '<path d="M96 64Q93 57 88 54"/><path d="M104 64Q107 57 112 54"/></g></svg>'
     )
 
 
@@ -150,19 +179,33 @@ def main() -> None:
     (PUB / "brand/mark.svg").write_text(bee_svg(COCOA, 190))
     (PUB / "brand/logo.svg").write_text(lockup_svg(COCOA))
     (PUB / "brand/logo-light.svg").write_text(lockup_svg(PINK))
-    (PUB / "favicon.svg").write_text(bee_svg(COCOA, 64, solid=True, bg=PINK, radius=34))
+    # Favicons: the logo's line bee on a dusty pink rounded square, with the
+    # line weight tuned per size so it stays crisp in browser tabs and search.
+    (PUB / "favicon.svg").write_text(icon_svg(11))
 
-    # Raster icons: solid bee on dusty pink, rounded on the big ones
-    for name, size, solid, radius in [
-        ("favicon-32.png", 32, True, 0),
-        ("apple-touch-icon.png", 180, False, 0),
-        ("icon-192.png", 192, False, 0),
-        ("icon-512.png", 512, False, 0),
-        ("brand/mark-512.png", 512, False, 0),
-    ]:
-        svg = bee_svg(COCOA, size, solid=solid, bg=PINK, radius=radius)
-        html = f'<html><body style="margin:0;background:{PINK}">{svg}</body></html>'
-        render_png(html, PUB / name, size, size)
+    def icon_png(svg: str, out: Path, size: int, transparent: bool = True) -> None:
+        bg = "transparent" if transparent else PINK
+        html = f'<html><body style="margin:0;background:{bg}">{svg}</body></html>'
+        render_png(html, out, size, size, transparent=transparent)
+
+    ico_frames = []
+    with tempfile.TemporaryDirectory() as tmp:
+        for size, stroke, stripes in [(16, 14, False), (32, 11, True), (48, 10, True)]:
+            frame = Path(tmp) / f"f{size}.png"
+            icon_png(icon_svg(stroke, stripes=stripes, size=size), frame, size)
+            ico_frames.append(Image.open(frame).convert("RGBA"))
+        ico_frames[-1].save(PUB / "favicon.ico", format="ICO", sizes=[(16, 16), (32, 32), (48, 48)], append_images=ico_frames[:-1])
+    icon_png(icon_svg(11, size=32), PUB / "favicon-32.png", 32)
+    icon_png(icon_svg(9, size=96), PUB / "favicon-96.png", 96)
+
+    # App icons: full square (iOS and Android round the corners themselves),
+    # bee kept inside the safe zone, logo-like line weight.
+    for name, size in [("apple-touch-icon.png", 180), ("icon-192.png", 192), ("icon-512.png", 512)]:
+        icon_png(icon_svg(8, fill=0.74, radius=0, size=size), PUB / name, size, transparent=False)
+
+    # The plain mark on pink, for profiles and documents
+    svg = bee_svg(COCOA, 512, bg=PINK, radius=0)
+    render_png(f'<html><body style="margin:0;background:{PINK}">{svg}</body></html>', PUB / "brand/mark-512.png", 512, 512)
 
     # Social share image (fonts inlined as data URIs so Chromium can load them from a blank page)
     import base64

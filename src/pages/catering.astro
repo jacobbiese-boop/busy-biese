@@ -26,7 +26,7 @@ const dessertTrays = products
   .filter((x): x is NonNullable<typeof x> => x !== null);
 
 const { radiusMiles, windows } = site.delivery;
-const order = orderLink();
+const order = orderLink({ type: 'Catering' });
 ---
 
 <Base

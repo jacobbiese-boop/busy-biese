@@ -11,6 +11,7 @@ import jostUrl from '@fontsource-variable/jost/files/jost-latin-wght-normal.woff
 
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Bee from '../components/Bee.astro';
 import { site } from '../config/site';
 
 interface Props {
@@ -23,6 +24,8 @@ interface Props {
   noindex?: boolean;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   ogType?: 'website' | 'product' | 'article';
+  /** Show the floating back-to-top bee (off on the Order page, where it could cover the form). */
+  backToTop?: boolean;
 }
 
 const {
@@ -33,6 +36,7 @@ const {
   noindex = false,
   jsonLd,
   ogType = 'website',
+  backToTop = true,
 } = Astro.props;
 
 const fullTitle = title ? `${title} | Busy Biese` : site.titleSuffix;
@@ -52,10 +56,11 @@ const ga4 = site.analytics.ga4;
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
 
-    <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml" />
-    <link rel="icon" href="/favicon-32.png?v=2" sizes="32x32" type="image/png" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />
-    <link rel="manifest" href="/site.webmanifest?v=2" />
+    <link rel="icon" href="/favicon.ico?v=3" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-96.png?v=3" sizes="96x96" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3" />
+    <link rel="manifest" href="/site.webmanifest?v=3" />
     <meta name="theme-color" content="#FBF7F2" />
 
     <link rel="preload" href={jostUrl} as="font" type="font/woff2" crossorigin />
@@ -104,13 +109,32 @@ const ga4 = site.analytics.ga4;
       <slot />
     </main>
     <Footer />
+    {
+      backToTop && (
+        <button class="to-top" type="button" data-to-top>
+          <Bee size={30} class="to-top-bee bee-bold" />
+          <span class="visually-hidden">Back to top</span>
+        </button>
+      )
+    }
 
     <script>
-      // Header shadow once the page scrolls
+      // Header shadow once the page scrolls, and the back-to-top bee further down
       const header = document.querySelector<HTMLElement>('[data-header]');
-      const onScroll = () => header?.classList.toggle('is-scrolled', window.scrollY > 8);
+      const toTop = document.querySelector<HTMLButtonElement>('[data-to-top]');
+      const onScroll = () => {
+        header?.classList.toggle('is-scrolled', window.scrollY > 8);
+        toTop?.classList.toggle('is-shown', window.scrollY > window.innerHeight * 1.2);
+      };
       onScroll();
       window.addEventListener('scroll', onScroll, { passive: true });
+      toTop?.addEventListener('click', () => {
+        const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        toTop.classList.add('is-flying');
+        window.setTimeout(() => toTop.classList.remove('is-flying'), 900);
+        window.scrollTo({ top: 0, behavior: calm ? 'auto' : 'smooth' });
+        document.querySelector<HTMLElement>('.brand')?.focus({ preventScroll: true });
+      });
 
       // Mobile menu
       const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
@@ -156,3 +180,81 @@ const ga4 = site.analytics.ga4;
     </script>
   </body>
 </html>
+
+<style>
+  .to-top {
+    position: fixed;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--pink);
+    color: var(--cocoa);
+    box-shadow: var(--shadow-s);
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(12px);
+    transition:
+      opacity 0.3s var(--ease),
+      transform 0.3s var(--ease),
+      background-color 0.2s var(--ease),
+      visibility 0s linear 0.3s;
+  }
+  .to-top.is-shown {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition-delay: 0s;
+  }
+  .to-top:hover {
+    background: var(--pink-matte);
+  }
+  .to-top :global(.to-top-bee) {
+    /* Head straight up: the mark is drawn tilted 32 degrees to the left */
+    transform: rotate(32deg);
+  }
+  .to-top:hover :global(.bee-wing-l) {
+    animation: bee-wing-l 0.07s linear infinite alternate;
+  }
+  .to-top:hover :global(.bee-wing-r) {
+    animation: bee-wing-r 0.07s linear infinite alternate;
+  }
+  .to-top.is-flying :global(.to-top-bee) {
+    animation: to-top-fly 0.8s var(--ease);
+  }
+  @keyframes to-top-fly {
+    0% {
+      transform: rotate(32deg);
+    }
+    40% {
+      transform: translateY(-34px) rotate(32deg);
+      opacity: 0;
+    }
+    41% {
+      transform: translateY(20px) rotate(32deg);
+      opacity: 0;
+    }
+    100% {
+      transform: rotate(32deg);
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .to-top.is-flying :global(.to-top-bee),
+    .to-top:hover :global(.bee-wing-l),
+    .to-top:hover :global(.bee-wing-r) {
+      animation: none;
+    }
+  }
+  @media print {
+    .to-top {
+      display: none;
+    }
+  }
+</style>

@@ -593,6 +593,195 @@ hr {
   opacity: 1;
   transform: none;
 }
+/* Siblings in a row arrive one after another */
+.js [data-reveal]:nth-child(2) {
+  transition-delay: 0.07s;
+}
+.js [data-reveal]:nth-child(3) {
+  transition-delay: 0.14s;
+}
+.js [data-reveal]:nth-child(4) {
+  transition-delay: 0.21s;
+}
+.js [data-reveal]:nth-child(5) {
+  transition-delay: 0.28s;
+}
+.js [data-reveal]:nth-child(6) {
+  transition-delay: 0.35s;
+}
+
+/* --------------------------------------------------------------------------
+   Bee motion. The bee is the one thing on the site that moves; everything
+   here is opt-in by class and switches off for reduced motion.
+     bee-flutter   soft, constant wing flutter (hero, back-to-top)
+     bee-buzz      fast wing buzz (loaders)
+     bee-flying    trail dots drift away from the bee (motion variant)
+     bee-arrive    trail draws in, then the bee lands (motion variant, once)
+     bee-loop      one playful loop (added by script on tap)
+   -------------------------------------------------------------------------- */
+.bee .bee-fly,
+.bee .bee-wing {
+  transform-box: fill-box;
+}
+.bee .bee-fly {
+  transform-origin: 50% 50%;
+}
+.bee .bee-wing-l {
+  transform-origin: 100% 88%;
+}
+.bee .bee-wing-r {
+  transform-origin: 0% 88%;
+}
+
+/* A heavier line for small UI bees (buttons, loaders) */
+.bee-bold > g {
+  stroke-width: 8.5;
+}
+.bee-bold .bee-stripes {
+  stroke-width: 6.5;
+}
+
+.bee-flutter .bee-wing-l {
+  animation: bee-wing-l 0.32s ease-in-out infinite alternate;
+}
+.bee-flutter .bee-wing-r {
+  animation: bee-wing-r 0.32s ease-in-out infinite alternate;
+}
+.bee-buzz .bee-wing-l {
+  animation: bee-wing-l 0.07s linear infinite alternate;
+}
+.bee-buzz .bee-wing-r {
+  animation: bee-wing-r 0.07s linear infinite alternate;
+}
+@keyframes bee-wing-l {
+  from {
+    transform: rotate(5deg);
+  }
+  to {
+    transform: rotate(-13deg);
+  }
+}
+@keyframes bee-wing-r {
+  from {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(13deg);
+  }
+}
+
+.bee-flying .bee-trail {
+  animation: bee-trail-flow 1.4s linear infinite;
+}
+@keyframes bee-trail-flow {
+  to {
+    stroke-dashoffset: -9;
+  }
+}
+
+.bee-arrive .bee-trail-reveal {
+  stroke-dasharray: 1 1;
+  animation: bee-trail-reveal 1.3s cubic-bezier(0.3, 0.7, 0.3, 1) 0.15s both;
+}
+@keyframes bee-trail-reveal {
+  from {
+    stroke-dashoffset: -1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.bee-arrive .bee-fly {
+  animation: bee-land 0.95s cubic-bezier(0.2, 0.9, 0.25, 1.2) 0.9s both;
+}
+@keyframes bee-land {
+  from {
+    opacity: 0;
+    transform: translate(-28px, 34px) scale(0.5) rotate(-16deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.bee-loop .bee-fly {
+  animation: bee-loop 1.2s cubic-bezier(0.45, 0.05, 0.35, 1) both;
+}
+@keyframes bee-loop {
+  0% {
+    transform: none;
+  }
+  25% {
+    transform: translate(-36px, -40px) rotate(-85deg) scale(1.05);
+  }
+  50% {
+    transform: translate(-6px, -90px) rotate(-190deg) scale(1.1);
+  }
+  75% {
+    transform: translate(32px, -48px) rotate(-290deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+/* The logo bee gives a little buzz on hover */
+.brand:hover .bee,
+.brand:focus-visible .bee {
+  animation: bee-wiggle 0.55s ease-in-out;
+}
+.brand:hover .bee-wing-l,
+.brand:focus-visible .bee-wing-l {
+  animation: bee-wing-l 0.07s linear 8 alternate;
+}
+.brand:hover .bee-wing-r,
+.brand:focus-visible .bee-wing-r {
+  animation: bee-wing-r 0.07s linear 8 alternate;
+}
+@keyframes bee-wiggle {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20% {
+    transform: rotate(-10deg);
+  }
+  45% {
+    transform: rotate(8deg);
+  }
+  70% {
+    transform: rotate(-4deg);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Page transitions: pages cross-fade while the header stays put
+   (browsers without support simply load the page as usual)
+   -------------------------------------------------------------------------- */
+@view-transition {
+  navigation: auto;
+}
+.site-header {
+  view-transition-name: site-header;
+}
+::view-transition-old(root) {
+  animation: vt-out 0.22s var(--ease) both;
+}
+::view-transition-new(root) {
+  animation: vt-in 0.32s var(--ease) both;
+}
+@keyframes vt-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
 
 /* --------------------------------------------------------------------------
    Prose (policy and about pages)
@@ -639,5 +828,20 @@ hr {
   .js [data-reveal] {
     opacity: 1;
     transform: none;
+  }
+  .bee .bee-fly,
+  .bee .bee-wing,
+  .bee .bee-trail,
+  .bee .bee-trail-reveal,
+  .brand .bee {
+    animation: none !important;
+  }
+  .bee .bee-trail-reveal {
+    stroke-dasharray: none;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

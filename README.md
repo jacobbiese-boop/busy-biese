@@ -26,16 +26,39 @@ Also built automatically: `sitemap-index.xml`, `robots.txt`, search-engine data 
 | Order form link, Instagram, WhatsApp, email, phone | `src/config/site.ts` |
 | Announcement bar at the top of every page | `src/config/site.ts` (`announcement`) |
 | Delivery radius, fees, delivery windows | `src/config/site.ts` (`delivery`) |
-| Show the Fillout form right on the Order page | `src/config/site.ts` (`fillout.formId`) |
+| Which Fillout form the Order page shows | `src/config/site.ts` (`fillout.formId`; empty shows a button instead) |
 | Live web address (domain) | `astro.config.mjs` (`SITE_URL`) |
 | Colors and fonts | `src/styles/global.css` (top of the file). The look follows the Busy Biese Visual System 1.0: ivory page, dusty pink panels, cocoa type, Parisienne for the name, Cormorant Garamond headlines, Jost text. |
 
 Commit the change to the `main` branch on GitHub and Hostinger rebuilds the site automatically in about a minute.
 
+## Order form
+
+The Order page shows the Fillout form "Busy Biese · Order request" right on the page
+(`fillout.formId` in `src/config/site.ts`). Every Order button on the site sends two values
+along with it, and the embed passes them on to Fillout:
+
+- `type`: the order type, such as `Menu items` or `Catering`
+- `item`: the exact item and size, such as `Cinnamon Rolls · 4 rolls`
+
+The Order page always shows the visitor what they picked. To have the form fill those in by
+itself too, open the form in Fillout, go to Settings > URL parameters and add `type` and
+`item`, then set the default value of "Order type" to `@type` and of "Item 1" to `@item`.
+The item names on the site match the form's options exactly, so keep the two in step when
+renaming an item or a size.
+
+## Motion
+
+The bee is the one thing on the site that moves: it flies in on the home page (tap it for a
+loop), buzzes when you point at the logo, carries the loading states, and takes you back to
+the top. All of it is in `src/styles/global.css` ("Bee motion") and switches off for anyone
+whose device asks for reduced motion.
+
 ## Photos
 
 Photos live in `public/photos` as WebP files named after the item (for example `cinnamon-rolls-800.webp`).
 Until a photo exists, the site shows a dusty pink panel with a small bee, so nothing breaks.
+Tapping a gallery photo opens it large.
 See `docs/PHOTOS.md` for the full list of photo names and `scripts/import_photos.py` to convert original photos.
 
 ## Hostinger build settings
@@ -71,6 +94,6 @@ src/components/        header, footer, bee mark, lockup, product list, gallery, 
 src/layouts/Base.astro page shell, SEO tags, scripts
 src/styles/global.css  design system
 public/                logo files, icons, social image, photos
-scripts/               photo import tool, brand asset generator
+scripts/               photo import tools, brand asset and favicon generator
 docs/                  notes
 ```

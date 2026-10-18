@@ -2,10 +2,11 @@
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
+import BeeLoader from '../components/BeeLoader.astro';
 import { site } from '../config/site';
 import { categories, productsIn } from '../data/menu';
 import { priceLabel } from '../lib/format';
-import { orderLink } from '../lib/order';
+import { formUrl } from '../lib/order';
 import { faqJsonLd } from '../lib/seo';
 
 const { flatFee, flatFeeUpTo, percentOver, radiusMiles, windows } = site.delivery;
@@ -39,6 +40,7 @@ const faqs = [
   title="Order"
   description={`Order from Busy Biese: made-to-order cinnamon rolls, cheesecakes, cookies, gift boxes, and halal cold cut trays. Pickup in ${site.location.city} or delivery within ${radiusMiles} miles. Please order ${site.ordering.noticeHours} hours ahead.`}
   jsonLd={faqJsonLd(faqs)}
+  backToTop={false}
 >
   <PageHero
     eyebrow="Order"
@@ -46,55 +48,45 @@ const faqs = [
     lead="Tell us what you would like and when you need it. We will confirm your order, timing, and total with you."
     tone="pink"
   >
-    <p class="picked" data-picked hidden>
-      <Icon name="check-badge" size={18} stroke={1.5} />
-      <span>You picked <strong data-picked-name></strong>. Add it to your order below.</span>
-    </p>
+    <ul class="facts" role="list">
+      <li>Order {site.ordering.noticeHours} hours ahead</li>
+      <li>Pickup in {site.location.city}</li>
+      <li>Delivery within {radiusMiles} miles</li>
+    </ul>
   </PageHero>
 
-  <section class="section-tight essentials-wrap">
+  <section class="section-tight form-section" id="form" aria-labelledby="form-title">
     <div class="container">
-      <ul class="essentials" role="list">
-        <li class="tile">
-          <h2>Order ahead</h2>
-          <p>
-            At least {site.ordering.noticeHours} hours for most items, 48 hours for strawberry boxes. Same-day orders are
-            not available.
-          </p>
-        </li>
-        <li class="tile">
-          <h2>Minimums</h2>
-          <p>Most items have a small minimum, listed on each menu item. Mix flavors where noted.</p>
-        </li>
-        <li class="tile">
-          <h2>Pickup</h2>
-          <p>Pick up in {site.location.city}. We share the pickup details when we confirm your order.</p>
-        </li>
-        <li class="tile">
-          <h2>Delivery</h2>
-          <p>
-            Within {radiusMiles} miles. ${flatFee} on orders up to ${flatFeeUpTo}; above that, {percentOver}% of the
-            order total. Windows: {windows.map((w) => w.time).join(' or ')}.
-          </p>
-        </li>
-      </ul>
-    </div>
-  </section>
-
-  <section class="section-tight form-section" id="form">
-    <div class="container">
+      <h2 id="form-title" class="visually-hidden">Order request form</h2>
+      <p class="picked" data-picked hidden>
+        <Icon name="check-badge" size={18} stroke={1.5} />
+        <span data-picked-item>
+          You picked <strong data-picked-name></strong>. Choose <em>Menu items</em> in the form to add it; you can change
+          the size or add more.
+        </span>
+        <span data-picked-type hidden>Choose <strong data-picked-type-name></strong> in the form to get started.</span>
+      </p>
       {
         formId ? (
-          <div class="form-panel">
-            <div
-              style="width:100%;min-height:640px;"
-              data-fillout-id={formId}
-              data-fillout-embed-type="standard"
-              data-fillout-inherit-parameters
-              data-fillout-dynamic-resize
-            />
+          <>
+            <div class="form-panel" data-form-embed>
+              <div class="form-loader" data-form-loader>
+                <BeeLoader size={84} />
+                <p role="status">Loading the order form…</p>
+              </div>
+              <div
+                class="form-frame"
+                data-fillout-id={formId}
+                data-fillout-embed-type="standard"
+                data-fillout-inherit-parameters
+                data-fillout-dynamic-resize
+              />
+            </div>
             <script is:inline src="https://server.fillout.com/embed/v1/" async />
-          </div>
+            <p class="form-alt" data-form-alt>
+              Form not showing? <a href={formUrl()} target="_blank" rel="noopener" data-order-link>Open it in a new tab</a>.
+            </p>
+          </>
         ) : (
           <div class="form-launch panel">
             <div>
@@ -104,7 +96,7 @@ const faqs = [
                 Choose your items, sizes, flavors, and a pickup or delivery time. The form opens in a new tab.
               </p>
             </div>
-            <a class="btn" href={orderLink().href} target="_blank" rel="noopener" data-order-link>
+            <a class="btn" href={formUrl()} target="_blank" rel="noopener" data-order-link>
               Open the order form
             </a>
           </div>
@@ -117,6 +109,36 @@ const faqs = [
           rel="noopener">Instagram</a
         >{site.contact.email && <>, or email <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></>}.
       </p>
+    </div>
+  </section>
+
+  <section class="section-tight essentials-wrap" aria-labelledby="good-to-know">
+    <div class="container">
+      <h2 id="good-to-know" class="visually-hidden">Good to know before you order</h2>
+      <ul class="essentials" role="list">
+        <li class="tile">
+          <h3>Order ahead</h3>
+          <p>
+            At least {site.ordering.noticeHours} hours for most items, 48 hours for strawberry boxes. Same-day orders are
+            not available.
+          </p>
+        </li>
+        <li class="tile">
+          <h3>Minimums</h3>
+          <p>Most items have a small minimum, listed on each menu item. Mix flavors where noted.</p>
+        </li>
+        <li class="tile">
+          <h3>Pickup</h3>
+          <p>Pick up in {site.location.city}. We share the pickup details when we confirm your order.</p>
+        </li>
+        <li class="tile">
+          <h3>Delivery</h3>
+          <p>
+            Within {radiusMiles} miles. ${flatFee} on orders up to ${flatFeeUpTo}; above that, {percentOver}% of the
+            order total. Windows: {windows.map((w) => w.time).join(' or ')}.
+          </p>
+        </li>
+      </ul>
     </div>
   </section>
 
@@ -177,41 +199,104 @@ const faqs = [
 </Base>
 
 <script>
-  const item = new URLSearchParams(window.location.search).get('item');
-  if (item) {
-    const box = document.querySelector<HTMLElement>('[data-picked]');
-    const name = document.querySelector<HTMLElement>('[data-picked-name]');
-    if (box && name) {
-      name.textContent = item.slice(0, 80);
+  const params = new URLSearchParams(window.location.search);
+  const item = params.get('item')?.slice(0, 90) ?? '';
+  const type = params.get('type')?.slice(0, 40) ?? '';
+
+  // Show what was picked above the form
+  const box = document.querySelector<HTMLElement>('[data-picked]');
+  const itemLine = document.querySelector<HTMLElement>('[data-picked-item]');
+  const typeLine = document.querySelector<HTMLElement>('[data-picked-type]');
+  const itemName = document.querySelector<HTMLElement>('[data-picked-name]');
+  const typeName = document.querySelector<HTMLElement>('[data-picked-type-name]');
+  if (box && itemLine && typeLine && itemName && typeName) {
+    if (item) {
+      itemName.textContent = item;
+      box.hidden = false;
+    } else if (type && type !== 'Menu items') {
+      typeName.textContent = type;
+      itemLine.hidden = true;
+      typeLine.hidden = false;
       box.hidden = false;
     }
-    document.querySelectorAll<HTMLAnchorElement>('[data-order-link]').forEach((a) => {
-      try {
-        const url = new URL(a.href);
-        url.searchParams.set('item', item.slice(0, 80));
-        a.href = url.toString();
-      } catch {
-        /* keep the original link */
+  }
+
+  // Keep the choice when the form opens in a new tab
+  document.querySelectorAll<HTMLAnchorElement>('[data-order-link]').forEach((a) => {
+    try {
+      const url = new URL(a.href);
+      if (type) url.searchParams.set('type', type);
+      if (item) url.searchParams.set('item', item);
+      a.href = url.toString();
+    } catch {
+      /* keep the original link */
+    }
+  });
+
+  // Swap the bee loader for the form once Fillout has drawn it. Fillout sizes
+  // the frame by setting a height on our container; the frame's load event
+  // (plus a moment) is the fallback.
+  const embed = document.querySelector<HTMLElement>('[data-form-embed]');
+  const frameBox = embed?.querySelector<HTMLElement>('.form-frame');
+  if (embed && frameBox) {
+    const done = () => embed.classList.add('is-loaded');
+    new MutationObserver((_, observer) => {
+      if (frameBox.style.height) {
+        observer.disconnect();
+        window.setTimeout(done, 150);
       }
-    });
+    }).observe(frameBox, { attributes: true, attributeFilter: ['style'] });
+    const watch = (frame: HTMLIFrameElement) => frame.addEventListener('load', () => window.setTimeout(done, 1500), { once: true });
+    const found = frameBox.querySelector('iframe');
+    if (found) watch(found);
+    else {
+      const observer = new MutationObserver(() => {
+        const frame = frameBox.querySelector('iframe');
+        if (frame) {
+          observer.disconnect();
+          watch(frame);
+        }
+      });
+      observer.observe(frameBox, { childList: true, subtree: true });
+    }
+    window.setTimeout(() => {
+      if (!embed.classList.contains('is-loaded')) document.documentElement.classList.add('form-slow');
+    }, 12000);
   }
 </script>
 
 <style>
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+    margin-top: 4px;
+    font-size: var(--step-micro);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+  }
+  .facts li + li::before {
+    content: '·';
+    margin-right: 22px;
+    color: var(--rose);
+  }
+
   .picked {
-    display: inline-flex;
-    align-items: center;
+    display: flex;
+    align-items: flex-start;
     gap: 10px;
-    background: var(--ivory);
-    border-radius: 999px;
-    padding: 10px 18px;
-    margin: 18px 0 0;
+    background: var(--pink);
+    border-radius: var(--radius);
+    padding: 12px 18px;
+    margin: 0 0 14px;
     font-size: var(--step-small);
+    line-height: 1.5;
   }
   .picked[hidden] {
     display: none;
   }
   .picked :global(svg) {
+    margin-top: 2px;
     color: var(--rose);
     flex: none;
   }
@@ -224,7 +309,7 @@ const faqs = [
     gap: 12px;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
   }
-  .essentials h2 {
+  .essentials h3 {
     font-size: var(--step-h3);
     font-weight: 600;
     margin-bottom: 6px;
@@ -239,11 +324,52 @@ const faqs = [
   .form-section {
     padding-top: 0;
   }
+  /* The Fillout form brings its own ivory card, so it sits right on the page */
   .form-panel {
-    background: var(--white);
-    border: 1px solid var(--border);
+    position: relative;
+    min-height: 560px;
+  }
+  .form-frame {
+    position: relative;
+    width: 100%;
+    min-height: 560px;
+  }
+  .is-loaded,
+  .is-loaded .form-frame {
+    min-height: 0;
+  }
+  .form-loader {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 14px;
+    background: var(--ivory);
     border-radius: var(--radius);
-    padding: clamp(16px, 3vw, 32px);
+    transition:
+      opacity 0.4s var(--ease),
+      visibility 0s linear 0.4s;
+  }
+  .form-loader p {
+    margin: 0;
+    color: var(--mauve);
+    font-size: var(--step-small);
+    letter-spacing: 0.08em;
+  }
+  .is-loaded .form-loader {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .form-alt {
+    margin: 12px 4px 0;
+    color: var(--mauve);
+    font-size: var(--step-small);
+  }
+  :global(html.form-slow) .form-alt {
+    color: var(--cocoa);
+    font-weight: 500;
   }
   .form-launch {
     display: flex;
