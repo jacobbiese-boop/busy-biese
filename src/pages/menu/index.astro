@@ -142,18 +142,26 @@ const order = orderLink({ type: 'Menu items' });
 </script>
 
 <style>
+  /* A rose dot sits in the space before each fact. The list is pulled left by
+     that space and the strip is clipped, so a dot never starts a wrapped line. */
   .facts {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px 22px;
-    margin-top: 4px;
+    row-gap: 8px;
+    margin: 4px 0 0 -48px;
+    clip-path: inset(0 0 0 48px);
     font-size: var(--step-micro);
     letter-spacing: 0.25em;
     text-transform: uppercase;
   }
-  .facts li + li::before {
+  .facts li {
+    position: relative;
+    padding-left: 48px;
+  }
+  .facts li::before {
     content: '·';
-    margin-right: 22px;
+    position: absolute;
+    left: 21px;
     color: var(--rose);
   }
 

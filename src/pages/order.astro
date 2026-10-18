@@ -11,6 +11,12 @@ import { faqJsonLd } from '../lib/seo';
 
 const { flatFee, flatFeeUpTo, percentOver, radiusMiles, windows } = site.delivery;
 const formId = site.fillout.formId;
+// Written as plain HTML on purpose: Fillout passes every other data-* attribute
+// on this div to the form as a URL parameter, so it must not pick up Astro's
+// scoped-style attribute.
+const frameHtml = formId
+  ? `<div class="form-frame" data-fillout-id="${formId.replace(/[^\w-]/g, '')}" data-fillout-embed-type="standard" data-fillout-inherit-parameters data-fillout-dynamic-resize></div>`
+  : '';
 
 const faqs = [
   {
@@ -74,13 +80,7 @@ const faqs = [
                 <BeeLoader size={84} />
                 <p role="status">Loading the order form…</p>
               </div>
-              <div
-                class="form-frame"
-                data-fillout-id={formId}
-                data-fillout-embed-type="standard"
-                data-fillout-inherit-parameters
-                data-fillout-dynamic-resize
-              />
+              <Fragment set:html={frameHtml} />
             </div>
             <script is:inline src="https://server.fillout.com/embed/v1/" async />
             <p class="form-alt" data-form-alt>
@@ -234,19 +234,29 @@ const faqs = [
   });
 
   // Swap the bee loader for the form once Fillout has drawn it. Fillout sizes
-  // the frame by setting a height on our container; the frame's load event
-  // (plus a moment) is the fallback.
+  // the form by setting a height on our container whenever it changes. If no
+  // size has arrived shortly after the frame loads (a tab opened in the
+  // background, for example), give the form a usable height until it does.
   const embed = document.querySelector<HTMLElement>('[data-form-embed]');
   const frameBox = embed?.querySelector<HTMLElement>('.form-frame');
   if (embed && frameBox) {
     const done = () => embed.classList.add('is-loaded');
-    new MutationObserver((_, observer) => {
+    const sized = new MutationObserver(() => {
       if (frameBox.style.height) {
-        observer.disconnect();
+        sized.disconnect();
         window.setTimeout(done, 150);
       }
-    }).observe(frameBox, { attributes: true, attributeFilter: ['style'] });
-    const watch = (frame: HTMLIFrameElement) => frame.addEventListener('load', () => window.setTimeout(done, 1500), { once: true });
+    });
+    sized.observe(frameBox, { attributes: true, attributeFilter: ['style'] });
+    const fallback = () => {
+      if (!frameBox.style.height) {
+        sized.disconnect();
+        frameBox.style.height = `${Math.max(560, Math.round(window.innerHeight * 0.85))}px`;
+      }
+      done();
+    };
+    const watch = (frame: HTMLIFrameElement) =>
+      frame.addEventListener('load', () => window.setTimeout(fallback, 1500), { once: true });
     const found = frameBox.querySelector('iframe');
     if (found) watch(found);
     else {
@@ -266,18 +276,26 @@ const faqs = [
 </script>
 
 <style>
+  /* A rose dot sits in the space before each fact. The list is pulled left by
+     that space and the strip is clipped, so a dot never starts a wrapped line. */
   .facts {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px 22px;
-    margin-top: 4px;
+    row-gap: 8px;
+    margin: 4px 0 0 -48px;
+    clip-path: inset(0 0 0 48px);
     font-size: var(--step-micro);
     letter-spacing: 0.25em;
     text-transform: uppercase;
   }
-  .facts li + li::before {
+  .facts li {
+    position: relative;
+    padding-left: 48px;
+  }
+  .facts li::before {
     content: '·';
-    margin-right: 22px;
+    position: absolute;
+    left: 21px;
     color: var(--rose);
   }
 
@@ -329,13 +347,13 @@ const faqs = [
     position: relative;
     min-height: 560px;
   }
-  .form-frame {
+  .form-panel :global(.form-frame) {
     position: relative;
     width: 100%;
     min-height: 560px;
   }
-  .is-loaded,
-  .is-loaded .form-frame {
+  .form-panel.is-loaded,
+  .form-panel.is-loaded :global(.form-frame) {
     min-height: 0;
   }
   .form-loader {
