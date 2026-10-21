@@ -75,8 +75,12 @@ export const site: SiteConfig = {
   ],
 
   links: {
-    /** The order form on its own page (used for the open-in-a-new-tab link). */
-    orderForm: 'https://intakeforms.fillout.com/busybiese',
+    /**
+     * The order form on its own page (used for the open-in-a-new-tab link).
+     * This is the form's public custom link, the same one used on Instagram and
+     * in print. If the custom link ever moves in Fillout, update it here too.
+     */
+    orderForm: 'https://intakeforms.fillout.com/BusyBieseBakery',
     instagram: 'https://instagram.com/busybiesebakery',
     instagramHandle: '@busybiesebakery',
     whatsapp: 'https://chat.whatsapp.com/Fv2PSFwW67e4rbtw3owCVp',

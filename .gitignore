@@ -20,3 +20,9 @@ Thumbs.db
 
 # local photo staging (originals go here before import; not committed)
 photo-inbox/
+
+# python caches from the scripts
+__pycache__/
+
+# private notes for Claude Code (this repo is public, so they stay local)
+CLAUDE.local.md

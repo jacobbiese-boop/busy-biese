@@ -47,6 +47,15 @@ itself too, open the form in Fillout, go to Settings > URL parameters and add `t
 The item names on the site match the form's options exactly, so keep the two in step when
 renaming an item or a size.
 
+The "Open it in a new tab" link under the form uses the form's public link,
+`https://intakeforms.fillout.com/BusyBieseBakery` (`links.orderForm`).
+
+## Working on the site with Claude Code
+
+`CLAUDE.md` holds the project notes Claude Code reads at the start of every session: commands,
+how deploys work, the ordering contract, the design rules and the open items. Keep it current
+when something important changes. Private notes go in `CLAUDE.local.md`, which is not committed.
+
 ## Motion
 
 The bee is the one thing on the site that moves: it flies in on the home page (tap it for a
