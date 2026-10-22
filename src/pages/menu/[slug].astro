@@ -7,7 +7,6 @@ import { products, getCategory, relatedProducts, type Product } from '../../data
 import { site } from '../../config/site';
 import { availablePhotos, photoUrl, photoSrcset } from '../../lib/photos';
 import { money, each, perItem, priceLabel, bestPerItem, sentenceList } from '../../lib/format';
-import { formItem, orderLink } from '../../lib/order';
 import { productJsonLd, breadcrumbJsonLd, faqJsonLd } from '../../lib/seo';
 
 export function getStaticPaths() {
@@ -25,7 +24,6 @@ const related = relatedProducts(product, 3);
 const best = bestPerItem(product);
 const showEach = product.tiers.some((t) => perItem(t) !== undefined);
 const servingGuide = product.tiers.filter((t) => t.serves);
-const order = orderLink({ type: 'Menu items', item: formItem(product) });
 const description = `${product.short} ${priceLabel(product)}. Made to order in ${site.location.city}, IL.`;
 
 const ld = [
@@ -96,7 +94,7 @@ const ld = [
 
           <div class="price-block">
             <div>
-              <p class="price">{priceLabel(product)}</p>
+              <p class="price" data-price-from={product.slug}>{priceLabel(product)}</p>
               {best && <p class="price-sub">As low as {each(best)} per {product.unit ?? 'item'}</p>}
             </div>
             {product.minimum && <p class="minimum">{product.minimum}</p>}
@@ -116,20 +114,18 @@ const ld = [
               {
                 product.tiers.map((t) => {
                   const unit = perItem(t);
-                  const tierOrder = orderLink({ type: 'Menu items', item: formItem(product, t) });
                   return (
-                    <tr>
+                    <tr data-tier={`${product.slug}|${t.label}`}>
                       <th scope="row">{t.label}</th>
-                      <td>{money(t.price)}</td>
-                      {showEach && <td class="each">{unit ? each(unit) : ''}</td>}
+                      <td data-tier-price>{money(t.price)}</td>
+                      {showEach && (
+                        <td class="each" data-tier-each>
+                          {unit ? each(unit) : ''}
+                        </td>
+                      )}
                       <td class="tier-go">
-                        <a
-                          class="tier-order"
-                          href={tierOrder.href}
-                          target={tierOrder.external ? '_blank' : undefined}
-                          rel={tierOrder.external ? 'noopener' : undefined}
-                        >
-                          Order<span class="visually-hidden"> {t.label}</span>
+                        <a class="tier-order" href="/order/" data-add={product.slug} data-size={t.label}>
+                          Add<span class="visually-hidden"> {t.label} to your order</span>
                         </a>
                       </td>
                     </tr>
@@ -172,12 +168,7 @@ const ld = [
           }
 
           <div class="btn-row cta">
-            <a
-              class="btn"
-              href={order.href}
-              target={order.external ? '_blank' : undefined}
-              rel={order.external ? 'noopener' : undefined}>Order this</a
-            >
+            <a class="btn" href="/order/" data-add={product.slug}>Add to order</a>
             <a class="btn btn-outline" href={site.links.whatsapp} target="_blank" rel="noopener">Ask a question</a>
           </div>
 

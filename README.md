@@ -10,7 +10,8 @@ Built with [Astro](https://astro.build) as a fast static site and deployed on Ho
 | Home | `/` |
 | Menu (all items, by category) | `/menu/` |
 | One page per item (17 items) | `/menu/<item>/` |
-| Order (order form + quick price guide) | `/order/` |
+| Order (build an order, pickup or delivery, an estimate, then send it) | `/order/` |
+| Custom requests (cakes, themed treats, catering, events) | `/order/request/` |
 | Catering and large orders | `/catering/` |
 | Our story | `/about/` |
 | Delivery and order policy | `/policies/` |
@@ -22,33 +23,39 @@ Also built automatically: `sitemap-index.xml`, `robots.txt`, search-engine data 
 
 | To change | Edit this file |
 | --- | --- |
-| Prices, sizes, flavors, descriptions, allergens, FAQs | `src/data/menu.ts` |
+| Prices, sizes, flavors, descriptions, allergens, FAQs | `src/data/menu.ts` (prices and sizes also live on the Price List sheet, see Ordering) |
 | Order form link, Instagram, WhatsApp, email, phone | `src/config/site.ts` |
 | Announcement bar at the top of every page | `src/config/site.ts` (`announcement`) |
 | Delivery radius, fees, delivery windows | `src/config/site.ts` (`delivery`) |
-| Which Fillout form the Order page shows | `src/config/site.ts` (`fillout.formId`; empty shows a button instead) |
+| Which Fillout forms the site shows | `src/config/site.ts` (`fillout.checkoutFormId` for checkout; `fillout.formId` for custom requests, empty shows a button instead) |
+| Live prices from the Price List sheet | `src/config/site.ts` (`priceFeed`) |
 | Live web address (domain) | `astro.config.mjs` (`SITE_URL`) |
 | Colors and fonts | `src/styles/global.css` (top of the file). The look follows the Busy Biese Visual System 1.0: ivory page, dusty pink panels, cocoa type, Parisienne for the name, Cormorant Garamond headlines, Jost text. |
 
 Commit the change to the `main` branch on GitHub and Hostinger rebuilds the site automatically in about a minute.
 
-## Order form
+## Ordering
 
-The Order page shows the Fillout form "Busy Biese · Order request" right on the page
-(`fillout.formId` in `src/config/site.ts`). Every Order button on the site sends two values
-along with it, and the embed passes them on to Fillout:
+Ordering runs through two Fillout forms and one Make automation (BB-01). The automation prices
+every order again from the Price List spreadsheet, numbers and logs it, files the customer and
+tells the bakery.
 
-- `type`: the order type, such as `Menu items` or `Catering`
-- `item`: the exact item and size, such as `Cinnamon Rolls · 4 rolls`
+- **Menu items: the cart.** Product tiles and size buttons say "Add to order". They open a small
+  sheet (size, flavor, extras, how many) and add the line to the visitor's order, which is kept in
+  their browser. `/order/` lists the order, asks pickup or delivery and the day and time, shows an
+  estimated total, and then shows the short "Busy Biese · Checkout" form
+  (`fillout.checkoutFormId`) for name, phone and email. The order travels to the form in the URL,
+  so nobody picks items twice.
+- **Custom requests.** Custom cakes, custom treats, catering and events go to `/order/request/`,
+  which shows the "Busy Biese · Order request" form (`fillout.formId`). Links can preselect the
+  order type with `?type=`.
+- **Prices.** The site's prices come from `src/data/menu.ts`. When `priceFeed` in
+  `src/config/site.ts` holds the Price List's published CSV links, the site uses the sheet's
+  prices, sizes, add-ons and delivery rules instead, so a change on the sheet shows on the site
+  within minutes. Either way the total on the site is an estimate: the automation prices the order
+  from the sheet and the bakery confirms the final price.
 
-The Order page always shows the visitor what they picked. To have the form fill those in by
-itself too, open the form in Fillout, go to Settings > URL parameters and add `type` and
-`item`, then set the default value of "Order type" to `@type` and of "Item 1" to `@item`.
-The item names on the site match the form's options exactly, so keep the two in step when
-renaming an item or a size.
-
-The "Open it in a new tab" link under the form uses the form's public link,
-`https://intakeforms.fillout.com/BusyBieseBakery` (`links.orderForm`).
+The details (URL parameters, slugs, the estimate rules, tests) are in `CLAUDE.md` under "Ordering".
 
 ## Working on the site with Claude Code
 

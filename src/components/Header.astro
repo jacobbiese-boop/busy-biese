@@ -38,7 +38,9 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     </nav>
 
     <div class="header-actions">
-      <a href="/order/" class="btn btn-small order-btn">Order</a>
+      <a href="/order/" class="btn btn-small order-btn" data-cart-link="Order"
+        >Order<span class="cart-count" data-cart-count aria-hidden="true" hidden>0</span></a
+      >
       <button
         class="menu-toggle"
         type="button"
@@ -69,7 +71,9 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
           }
         </ul>
       </nav>
-      <a href="/order/" class="btn mobile-order">Order now</a>
+      <a href="/order/" class="btn mobile-order" data-cart-link="Your order"
+        >Your order <span class="cart-count" data-cart-count aria-hidden="true" hidden>0</span></a
+      >
       <div class="mobile-social">
         <a href={site.links.instagram} target="_blank" rel="noopener">
           <Icon name="instagram" size={18} stroke={1.5} /> Instagram

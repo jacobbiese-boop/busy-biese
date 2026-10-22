@@ -1,0 +1,33 @@
+---
+/**
+ * Ordering helpers present on every page (rendered once by Base.astro):
+ * - the menu baked in at build time, so prices and the cart work offline or if
+ *   the Price List cannot be reached (src/scripts/shop.ts then swaps in live prices)
+ * - the "add to order" sheet (a native dialog, filled in by the script)
+ * - a small toast after something is added, and the cart bar at the bottom
+ */
+import { fallbackShop } from '../lib/shop-build';
+import { site } from '../config/site';
+
+const shopJson = JSON.stringify(fallbackShop()).replace(/</g, '\\u003c');
+const feed = JSON.stringify(site.priceFeed);
+---
+
+<script type="application/json" id="bb-shop" data-feed={feed} set:html={shopJson} />
+<dialog class="osheet" data-osheet aria-label="Add to your order"></dialog>
+<div class="bb-toast" data-toast role="status" aria-live="polite" hidden></div>
+<aside class="cartbar" data-cartbar aria-label="Your order" hidden>
+  <a href="/order/" class="cartbar-link">
+    <span class="cartbar-text"><span class="cartbar-title">Your order</span> <span data-cartbar-text></span></span>
+    <span class="cartbar-go"
+      >Review and send
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+        ><path d="M4.5 12h15M13.5 6l6 6-6 6"></path></svg
+      ></span
+    >
+  </a>
+</aside>
+
+<script>
+  import '../scripts/shop';
+</script>

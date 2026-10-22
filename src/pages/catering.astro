@@ -26,6 +26,8 @@ const dessertTrays = products
   .filter((x): x is NonNullable<typeof x> => x !== null);
 
 const { radiusMiles, windows } = site.delivery;
+const windowNames = windows.map((w) => `${w.label.toLowerCase()} (${w.time})`);
+const windowList = windowNames.length > 1 ? `${windowNames.slice(0, -1).join(', ')} or ${windowNames[windowNames.length - 1]}` : windowNames.join('');
 const order = orderLink({ type: 'Catering' });
 ---
 
@@ -177,7 +179,7 @@ const order = orderLink({ type: 'Catering' });
         <article class="tile">
           <h3>Delivery windows</h3>
           <p>
-            We deliver within {radiusMiles} miles in two windows: {windows.map((w) => `${w.label.toLowerCase()} (${w.time})`).join(' and ')}.
+            We deliver within {radiusMiles} miles. Pick a window when you order: {windowList}.
           </p>
         </article>
         <article class="tile">

@@ -1,15 +1,14 @@
 ---
-import Base from '../layouts/Base.astro';
-import PageHero from '../components/PageHero.astro';
-import Icon from '../components/Icon.astro';
-import BeeLoader from '../components/BeeLoader.astro';
-import { site } from '../config/site';
-import { categories, productsIn } from '../data/menu';
-import { priceLabel } from '../lib/format';
-import { formUrl } from '../lib/order';
-import { faqJsonLd } from '../lib/seo';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import BeeLoader from '../../components/BeeLoader.astro';
+import { site } from '../../config/site';
+import { customTypes, formUrl, orderLink } from '../../lib/order';
+import { faqJsonLd } from '../../lib/seo';
 
 const { flatFee, flatFeeUpTo, percentOver, radiusMiles, windows } = site.delivery;
+const windowList = windows.map((w) => w.time).join(', ');
 const formId = site.fillout.formId;
 // Written as plain HTML on purpose: Fillout passes every other data-* attribute
 // on this div to the form as a URL parameter, so it must not pick up Astro's
@@ -43,15 +42,15 @@ const faqs = [
 ---
 
 <Base
-  title="Order"
-  description={`Order from Busy Biese: made-to-order cinnamon rolls, cheesecakes, cookies, gift boxes, and halal cold cut trays. Pickup in ${site.location.city} or delivery within ${radiusMiles} miles. Please order ${site.ordering.noticeHours} hours ahead.`}
+  title="Custom Orders"
+  description={`Request a custom cake, themed treats, catering, or an event booking from Busy Biese in ${site.location.city}, IL. Tell us what you have in mind and we will send you a quote.`}
   jsonLd={faqJsonLd(faqs)}
   backToTop={false}
 >
   <PageHero
-    eyebrow="Order"
-    title="Place an <em>order</em>"
-    lead="Tell us what you would like and when you need it. We will confirm your order, timing, and total with you."
+    eyebrow="Custom orders"
+    title="Cakes, treats, <em>catering</em> and events"
+    lead="Tell us what you have in mind and when you need it. We will put together a quote and confirm the details with you."
     tone="pink"
   >
     <ul class="facts" role="list">
@@ -61,9 +60,30 @@ const faqs = [
     </ul>
   </PageHero>
 
+  <section class="section-tight types-section" aria-labelledby="types-title">
+    <div class="container">
+      <h2 id="types-title" class="visually-hidden">What would you like?</h2>
+      <ul class="custom-tiles" role="list">
+        {
+          customTypes.map((c) => (
+            <li>
+              <a class="custom-tile" href={orderLink({ type: c.type }).href} data-type-link={c.type}>
+                <h3>{c.title}</h3>
+                <p>{c.text}</p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="menu-note">
+        Ordering from the menu? Pick your treats and see prices on the <a href="/order/">order page</a>.
+      </p>
+    </div>
+  </section>
+
   <section class="section-tight form-section" id="form" aria-labelledby="form-title">
     <div class="container">
-      <h2 id="form-title" class="visually-hidden">Order request form</h2>
+      <h2 id="form-title" class="visually-hidden">Request form</h2>
       <p class="picked" data-picked hidden>
         <Icon name="check-badge" size={18} stroke={1.5} />
         <span data-picked-item>
@@ -135,38 +155,10 @@ const faqs = [
           <h3>Delivery</h3>
           <p>
             Within {radiusMiles} miles. ${flatFee} on orders up to ${flatFeeUpTo}; above that, {percentOver}% of the
-            order total. Windows: {windows.map((w) => w.time).join(' or ')}.
+            order total. Windows: {windowList}.
           </p>
         </li>
       </ul>
-    </div>
-  </section>
-
-  <section class="section-tight" id="price-guide">
-    <div class="container">
-      <div class="section-head">
-        <p class="eyebrow">Quick price guide</p>
-        <h2>Everything on the menu, at a glance</h2>
-        <p>Tap any item for sizes, flavors, and details.</p>
-      </div>
-      <div class="guide">
-        {
-          categories.map((c) => (
-            <div class="guide-group">
-              <h3>{c.name}</h3>
-              <ul role="list">
-                {productsIn(c.id).map((p) => (
-                  <li>
-                    <a href={`/menu/${p.slug}/`}>{p.name}</a>
-                    <span class="dots" aria-hidden="true" />
-                    <span class="guide-price">{priceLabel(p)}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))
-        }
-      </div>
     </div>
   </section>
 
@@ -220,6 +212,11 @@ const faqs = [
       box.hidden = false;
     }
   }
+
+  // Mark the chosen request type
+  document.querySelectorAll<HTMLAnchorElement>('[data-type-link]').forEach((a) => {
+    if (type && a.dataset.typeLink === type) a.setAttribute('aria-current', 'true');
+  });
 
   // Keep the choice when the form opens in a new tab
   document.querySelectorAll<HTMLAnchorElement>('[data-order-link]').forEach((a) => {
@@ -319,6 +316,21 @@ const faqs = [
     flex: none;
   }
 
+  .types-section {
+    padding-bottom: 0;
+  }
+  .menu-note {
+    margin: 14px 4px 0;
+    font-size: var(--step-small);
+    color: var(--mauve);
+  }
+  .custom-tile[aria-current='true'] {
+    border-color: var(--cocoa);
+    background: var(--pink-wash);
+  }
+  .form-section {
+    padding-top: clamp(24px, 3vw, 40px);
+  }
   .essentials-wrap {
     padding-top: 0;
   }
@@ -339,9 +351,6 @@ const faqs = [
     line-height: 1.55;
   }
 
-  .form-section {
-    padding-top: 0;
-  }
   /* The Fillout form brings its own ivory card, so it sits right on the page */
   .form-panel {
     position: relative;
@@ -409,51 +418,6 @@ const faqs = [
     margin: 18px 4px 0;
     color: var(--mauve);
     font-size: var(--step-small);
-  }
-
-  .guide {
-    display: grid;
-    gap: 18px 40px;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
-  }
-  .guide-group h3 {
-    font-family: var(--font-body);
-    font-size: var(--step-micro);
-    font-weight: 400;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--mauve);
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--cocoa);
-    margin: 0 0 4px;
-  }
-  .guide-group li {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    padding: 9px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: var(--step-body-small);
-  }
-  .guide-group a {
-    text-decoration: none;
-    color: var(--cocoa);
-  }
-  .guide-group a:hover {
-    color: var(--rose-text);
-    text-decoration: underline;
-  }
-  .dots {
-    flex: 1;
-    border-bottom: 1px dotted var(--dashed);
-    transform: translateY(-4px);
-    min-width: 12px;
-  }
-  .guide-price {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.05rem;
-    white-space: nowrap;
   }
 
   .faq details {

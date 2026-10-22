@@ -1,0 +1,353 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import BeeLoader from '../../components/BeeLoader.astro';
+import { site } from '../../config/site';
+import { categories, productsIn } from '../../data/menu';
+import { priceLabel } from '../../lib/format';
+import { customTypes, orderLink } from '../../lib/order';
+import { faqJsonLd } from '../../lib/seo';
+
+const { flatFee, flatFeeUpTo, percentOver, radiusMiles } = site.delivery;
+
+const faqs = [
+  {
+    q: 'When is my order confirmed?',
+    a: 'Sending your order is a request. We look it over and confirm your items, timing, and final price with you, usually within 24 hours. Nothing is charged when you send it.',
+  },
+  {
+    q: 'How do I pay?',
+    a: 'Once we confirm your order and the final price, we let you know how to pay.',
+  },
+  {
+    q: 'Can I order for tomorrow?',
+    a: `We need at least ${site.ordering.noticeHours} hours notice for most items (48 hours for strawberry boxes), so same-day and next-day orders are not available. The calendar on this page only offers days we can make.`,
+  },
+  {
+    q: 'Do you deliver?',
+    a: `Yes, within ${radiusMiles} miles of ${site.location.city}. Delivery is $${flatFee} on orders up to $${flatFeeUpTo}. Above $${flatFeeUpTo}, the fee is ${percentOver}% of the order total. You can also pick up in ${site.location.city}.`,
+  },
+  {
+    q: 'Can I order for a large event?',
+    a: `Yes. For orders over our largest tray size, or about ${site.ordering.largeOrderPieces} pieces or more, send a catering request below and we will put together a custom quote.`,
+  },
+  {
+    q: 'What if someone has a food allergy?',
+    a: 'Everything is made in a kitchen that also handles wheat, dairy, eggs, soy, and tree nuts. Each menu item lists its allergens. If you have a severe allergy, please message us before ordering.',
+  },
+];
+---
+
+<Base
+  title="Order"
+  description={`Order from Busy Biese: pick cinnamon rolls, cheesecakes, cookies, gift boxes, and halal cold cut trays, choose pickup or delivery, and see an estimate before you send it. Please order ${site.ordering.noticeHours} hours ahead.`}
+  jsonLd={faqJsonLd(faqs)}
+  backToTop={false}
+>
+  <PageHero
+    eyebrow="Order"
+    title="Your <em>order</em>"
+    lead="Pick your treats, choose pickup or delivery and a day, then send it to us. We confirm the details and the final price before anything is made."
+    tone="pink"
+  >
+    <ul class="facts" role="list">
+      <li>Order {site.ordering.noticeHours} hours ahead</li>
+      <li>Pickup in {site.location.city}</li>
+      <li>Delivery within {radiusMiles} miles</li>
+    </ul>
+  </PageHero>
+
+  <section
+    class="section-tight checkout"
+    id="order"
+    aria-label="Your order"
+    data-checkout
+    data-form-id={site.fillout.checkoutFormId}
+  >
+    <div class="container checkout-grid">
+      <div class="checkout-main">
+        <noscript>
+          <div class="panel">
+            <h2>Ordering needs JavaScript</h2>
+            <p>
+              Turn on JavaScript to build your order here, or send us a request with the <a href="/order/request/"
+                >request form</a
+              >.
+            </p>
+          </div>
+        </noscript>
+
+        <div class="co-thanks panel" data-co-thanks hidden tabindex="-1">
+          <p class="eyebrow">Sent</p>
+          <h2>Thank you! Your order request is in.</h2>
+          <p>
+            We will look it over and confirm the details and the final price within 24 hours. A copy of your request is on
+            its way to your email.
+          </p>
+          <div data-co-thanks-recap></div>
+          <div class="btn-row">
+            <a class="btn" href="/menu/">Back to the menu</a>
+            <a class="btn btn-outline" href={site.links.instagram} target="_blank" rel="noopener">Follow on Instagram</a>
+          </div>
+        </div>
+
+        <div class="co-review" data-co-review hidden>
+          <div class="co-review-head">
+            <h2>Your order</h2>
+            <button type="button" class="co-link" data-co-edit>Edit order</button>
+          </div>
+          <ul role="list" data-co-review-lines></ul>
+          <p data-co-review-plan></p>
+        </div>
+
+        <div class="co-steps" data-co-steps>
+          <section class="co-step" aria-labelledby="co-step1">
+            <h2 id="co-step1" tabindex="-1"><span class="co-num" aria-hidden="true">1</span> Your treats</h2>
+            <ul class="co-lines" role="list" data-co-lines hidden></ul>
+            <div class="co-empty" data-co-empty>
+              <p>Nothing here yet. Add treats below, or browse the <a href="/menu/">full menu</a> with photos.</p>
+            </div>
+            <details class="co-picker" data-co-picker>
+              <summary>Add treats <Icon name="plus" size={18} stroke={1.5} /></summary>
+              <div class="co-picker-body">
+                {
+                  categories.map((c) => (
+                    <div class="co-cat">
+                      <h3>{c.name}</h3>
+                      <ul role="list">
+                        {productsIn(c.id).map((p) => (
+                          <li>
+                            <button type="button" class="co-pick" data-add={p.slug}>
+                              <span class="co-pick-name">{p.name}</span>
+                              <span class="co-pick-price" data-price-from={p.slug}>
+                                {priceLabel(p)}
+                              </span>
+                              <span class="co-pick-add" aria-hidden="true">
+                                Add
+                              </span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))
+                }
+                <div data-co-picker-extra></div>
+              </div>
+            </details>
+          </section>
+
+          <section class="co-step" aria-labelledby="co-step2">
+            <h2 id="co-step2"><span class="co-num" aria-hidden="true">2</span> Pickup or delivery</h2>
+            <div class="co-choices" role="radiogroup" aria-labelledby="co-step2">
+              <label class="opt">
+                <input type="radio" name="fulfillment" value="Pickup" />
+                <span class="opt-main">
+                  <span class="opt-label">Pickup</span>
+                  <span class="opt-sub">In {site.location.city}. We share the address when we confirm.</span>
+                </span>
+              </label>
+              <label class="opt">
+                <input type="radio" name="fulfillment" value="Delivery" />
+                <span class="opt-main">
+                  <span class="opt-label">Delivery</span>
+                  <span class="opt-sub" data-co-fee-rule
+                    >Within {radiusMiles} miles. ${flatFee} on orders up to ${flatFeeUpTo}, {percentOver}% above that.</span
+                  >
+                </span>
+              </label>
+            </div>
+            <div class="co-address" data-co-address hidden>
+              <label class="field">
+                Street address
+                <input name="street" autocomplete="street-address" maxlength="120" />
+              </label>
+              <div class="co-row">
+                <label class="field">
+                  City
+                  <input name="city" autocomplete="address-level2" maxlength="60" />
+                </label>
+                <label class="field">
+                  ZIP code
+                  <input name="zip" autocomplete="postal-code" inputmode="numeric" maxlength="10" />
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="co-step" aria-labelledby="co-step3">
+            <h2 id="co-step3"><span class="co-num" aria-hidden="true">3</span> Day and time</h2>
+            <div class="co-when">
+              <div>
+                <label class="field">
+                  Day
+                  <input type="date" name="date" data-co-date />
+                </label>
+                <p class="co-hint" data-co-date-hint></p>
+              </div>
+              <fieldset class="co-windows">
+                <legend>Time</legend>
+                <div class="chips-choice" data-co-windows-list></div>
+              </fieldset>
+            </div>
+          </section>
+        </div>
+
+        <section class="co-step co-details" data-co-details hidden aria-labelledby="co-step4">
+          <h2 id="co-step4" tabindex="-1"><span class="co-num" aria-hidden="true">4</span> Your details</h2>
+          <div class="co-frame" data-co-frame>
+            <div class="co-loader">
+              <BeeLoader size={72} />
+              <p role="status">Loading the last step…</p>
+            </div>
+          </div>
+          <p class="co-alt" data-co-alt>
+            Form not showing? <a data-co-newtab href="#order" target="_blank" rel="noopener">Open it in a new tab</a>.
+          </p>
+        </section>
+      </div>
+
+      <aside class="checkout-side" aria-label="Estimate">
+        <div class="co-summary" data-co-summary>
+          <h2 class="co-summary-title">Estimate</h2>
+          <dl>
+            <div><dt>Items</dt><dd data-co-subtotal>$0.00</dd></div>
+            <div data-co-delivery-row hidden><dt>Delivery</dt><dd data-co-delivery>$0.00</dd></div>
+            <div class="co-total"><dt>Estimated total</dt><dd data-co-total>$0.00</dd></div>
+          </dl>
+          <p class="co-fine">From our current prices. We confirm the final price with you before anything is made, and nothing is charged now.</p>
+          <p class="co-problem" role="alert" data-co-problem></p>
+          <button type="button" class="btn co-continue" data-co-continue>Continue to your details</button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section-tight" aria-labelledby="custom-title">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Something custom?</p>
+        <h2 id="custom-title">Cakes, themed treats, catering and events</h2>
+        <p>Tell us what you have in mind and we will put together a quote.</p>
+      </div>
+      <ul class="custom-tiles" role="list">
+        {
+          customTypes.map((c) => (
+            <li>
+              <a class="custom-tile" href={orderLink({ type: c.type }).href}>
+                <h3>{c.title}</h3>
+                <p>{c.text}</p>
+                <span class="text-link">
+                  Start a request <Icon name="arrow" size={14} stroke={1.6} />
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="container-narrow">
+      <div class="section-head">
+        <p class="eyebrow">Good to know</p>
+        <h2>Ordering questions</h2>
+      </div>
+      <div class="faq">
+        {
+          faqs.map((f, i) => (
+            <details open={i === 0}>
+              <summary>
+                {f.q}
+                <Icon name="plus" size={18} class="faq-icon" stroke={1.5} />
+              </summary>
+              <p>{f.a}</p>
+            </details>
+          ))
+        }
+      </div>
+      <p class="more">
+        Questions first? Message us on <a href={site.links.whatsapp} target="_blank" rel="noopener">WhatsApp</a> or <a
+          href={site.links.instagram}
+          target="_blank"
+          rel="noopener">Instagram</a
+        >. See the full <a href="/policies/">delivery and order policy</a>.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../../scripts/checkout';
+</script>
+
+<style>
+  /* A rose dot sits in the space before each fact. The list is pulled left by
+     that space and the strip is clipped, so a dot never starts a wrapped line. */
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 8px;
+    margin: 4px 0 0 -48px;
+    clip-path: inset(0 0 0 48px);
+    font-size: var(--step-micro);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+  }
+  .facts li {
+    position: relative;
+    padding-left: 48px;
+  }
+  .facts li::before {
+    content: '·';
+    position: absolute;
+    left: 21px;
+    color: var(--rose);
+  }
+
+  .faq details {
+    border-bottom: 1px solid var(--border);
+  }
+  .faq details:first-of-type {
+    border-top: 1px solid var(--border);
+  }
+  .faq summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 0;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq summary :global(.faq-icon) {
+    flex: none;
+    color: var(--rose);
+    transition: transform 0.25s var(--ease);
+  }
+  .faq details[open] summary :global(.faq-icon) {
+    transform: rotate(45deg);
+  }
+  .faq details p {
+    margin: 0 0 16px;
+    font-size: var(--step-body-small);
+  }
+  .more {
+    margin-top: 24px;
+    color: var(--mauve);
+    font-size: var(--step-small);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .faq summary :global(.faq-icon) {
+      transition: none;
+    }
+  }
+</style>

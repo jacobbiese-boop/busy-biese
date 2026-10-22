@@ -1,12 +1,11 @@
 ---
 /**
- * Products as buttons. Each one is a white tile that sends the visitor to the
- * order form with the item filled in; a small "Details" link opens the item's
- * own page (sizes, flavors, allergens).
+ * Products as buttons. Each one is a white tile: tapping it opens the "add to
+ * order" sheet (sizes, flavors, add-ons, how many). Without JavaScript it opens
+ * the item's own page instead. A small "Details" link opens the item's page.
  */
 import type { Product } from '../data/menu';
 import { priceLabel } from '../lib/format';
-import { formItem, orderLink } from '../lib/order';
 import Icon from './Icon.astro';
 
 interface Props {
@@ -25,23 +24,20 @@ const { products, describe = true, details = true, columns = 3, class: className
 <ul class:list={['plist', `plist-${columns}`, className]} role="list">
   {
     products.map((p) => {
-      const link = orderLink({ type: 'Menu items', item: formItem(p) });
       const minShort = p.minimum?.replace(/\. .*$/, '');
       return (
         <li class="plist-item">
-          <a
-            class="plist-main"
-            href={link.href}
-            target={link.external ? '_blank' : undefined}
-            rel={link.external ? 'noopener' : undefined}
-          >
+          <a class="plist-main" href={`/menu/${p.slug}/`} data-add={p.slug}>
             <span class="plist-name">{p.name}</span>
             {describe && p.short && <span class="plist-desc">{p.short}</span>}
             {minShort && <span class="plist-min">{minShort}</span>}
             <span class="plist-foot">
-              <span class="plist-price">{priceLabel(p)}</span>
+              <span class="plist-price" data-price-from={p.slug}>
+                {priceLabel(p)}
+              </span>
               <span class="plist-go">
-                Order <Icon name="arrow" size={12} stroke={1.8} class="arrow" />
+                <span class="plist-go-text">Add to order</span>
+                <Icon name="plus" size={12} stroke={1.8} />
               </span>
             </span>
           </a>
@@ -153,7 +149,10 @@ const { products, describe = true, details = true, columns = 3, class: className
     transition: transform 0.25s var(--ease);
   }
   .plist-item:hover .plist-go :global(svg) {
-    transform: translateX(3px);
+    transform: rotate(90deg);
+  }
+  .plist-main[data-unavailable] .plist-go {
+    visibility: hidden;
   }
   .plist-details {
     position: absolute;

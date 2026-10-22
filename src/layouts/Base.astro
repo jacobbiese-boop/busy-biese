@@ -4,6 +4,7 @@ import '@fontsource-variable/cormorant-garamond/wght.css';
 import '@fontsource-variable/cormorant-garamond/wght-italic.css';
 import '@fontsource-variable/jost/wght.css';
 import '../styles/global.css';
+import '../styles/order.css';
 
 import parisienneUrl from '@fontsource/parisienne/files/parisienne-latin-400-normal.woff2?url';
 import cormorantUrl from '@fontsource-variable/cormorant-garamond/files/cormorant-garamond-latin-wght-normal.woff2?url';
@@ -12,6 +13,7 @@ import jostUrl from '@fontsource-variable/jost/files/jost-latin-wght-normal.woff
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Bee from '../components/Bee.astro';
+import OrderSheet from '../components/OrderSheet.astro';
 import { site } from '../config/site';
 import { siteVersion } from '../config/version';
 
@@ -111,6 +113,7 @@ const ga4 = site.analytics.ga4;
       <slot />
     </main>
     <Footer />
+    <OrderSheet />
     {
       backToTop && (
         <button class="to-top" type="button" data-to-top>

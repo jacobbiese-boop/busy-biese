@@ -38,42 +38,52 @@ npm i --no-save @astrojs/check typescript && npx astro check   # type check, exp
 Jacob plans and reviews changes with Claude in Cowork. Cowork builds each version, shows him a
 preview of the site, and saves a version zip in his Google Drive under My Drive > Nexus > Busy Biese
 (on his PC usually `G:\My Drive\Nexus\Busy Biese`). Once he approves a version he sends you one
-line, such as "Please refer to busy-biese-v1.1.zip and push the edits". That line is his go-ahead
-to push that version, as long as every check below passes.
+line, such as "Please refer to busy-biese-v1.1.zip in my Google Drive (Nexus > Busy Biese) and push
+the edits". That line is his go-ahead to push that version, as long as every check below passes.
 
-Each zip holds `VERSION.md` (what changes, in plain words), `manifest.json` (version, base commit,
-each changed file with its SHA-256, files to delete, commit message, tag) and `files/` (the changed
-files at their repo paths). To apply one:
+Each zip holds `VERSION.md` (what changes, in plain words, and the exact steps), `manifest.json`
+(version, base commit, each changed file with its SHA-256, files to delete, commit message) and
+`files/` (the changed files at their repo paths). To apply one:
 
-1. Work in the local clone of this repo (clone it if there is none). Check out `main`,
+1. Get the zip from Google Drive (the Drive connector finds it by name). Work in a clone of
+   https://github.com/jacobbiese-boop/busy-biese; if this session opened in another repo, clone or
+   attach busy-biese and work there. Never apply a version zip to another repo. Check out `main`,
    `git pull --ff-only`, and make sure the working tree is clean.
 2. `git rev-parse HEAD` must equal the manifest's `base_commit`. If `main` has moved on, stop and
    tell Jacob so Cowork can rebuild the version on top of it. Never merge by hand.
 3. Copy `files/` over the repo, delete the paths listed in `delete`, and check each file's
    SHA-256 against the manifest (PowerShell: `Get-FileHash -Algorithm SHA256 <file>`).
-   `git status` must list exactly the manifest's files.
+   `git status --short --untracked-files=all` must list exactly the manifest's files.
 4. `npm ci`, `npm run build` and the type check must pass.
-5. Commit with the manifest's message, tag it with the manifest's tag, and
-   `git push origin main --follow-tags`.
-6. About a minute later, open https://busybiese.com and confirm the page head shows
-   `<meta name="busy-biese-version" content="...">` with the new version, then look over the
-   pages the version changed.
-7. Tell Jacob in two short lines what went live (version and commit). If any step fails, stop
-   before pushing and tell him what failed; never push a version that did not pass.
+5. Commit with the manifest's message and `git push origin main`. Do not tag: the version number
+   is in the commit message and in the page head (cloud sessions cannot push tags).
+6. If you can reach https://busybiese.com, check about a minute later that the page head shows
+   `<meta name="busy-biese-version" content="...">` with the new version. If you cannot, say so:
+   Cowork checks the live site after every push.
+7. Tell Jacob in two short lines what was pushed (version and short commit hash) and whether you
+   could check the live site. If any step fails, stop before pushing and tell him what failed;
+   never push a version that did not pass.
 
 `src/config/version.ts` holds the version number; every version zip updates it.
 
 ## Project map
 
 ```
-src/config/site.ts      business settings: links, Fillout form, contact, delivery, announcement, GA4
+src/config/site.ts      business settings: links, Fillout forms, price feed, contact, delivery, announcement, GA4
 src/config/version.ts   the site version, shown in the page head as busy-biese-version
 src/data/menu.ts        every product: names, sizes (tiers), prices, allergens, FAQs, photo names; categories
-src/pages/              index, menu/index, menu/[slug] (one page per product), order, catering, about, policies, 404, robots.txt.ts
-src/layouts/Base.astro  page shell: SEO tags, icons, header, footer, back to top bee, view transitions
+src/pages/              index, menu/index, menu/[slug] (one page per product), order/index (cart and checkout),
+                        order/request (custom requests), catering, about, policies, 404, robots.txt.ts
+src/layouts/Base.astro  page shell: SEO tags, icons, header, footer, back to top bee, page transitions, ordering helpers
 src/components/         Header, Footer, Logo (lockup), Bee (the mark, with motion variants), BeeLoader,
-                        ProductList, Gallery (with the full screen photo viewer), Photo, PageHero, Icon
-src/lib/order.ts        order links: orderLink(), formItem(), formUrl(), OrderType
+                        ProductList, Gallery (with the full screen photo viewer), Photo, PageHero, Icon,
+                        OrderSheet (baked-in menu, the add sheet, toast and cart bar on every page)
+src/lib/shop-core.ts    ordering core shared by build and browser: types, CSV, live price merge, prices, cart param
+src/lib/shop-build.ts   the menu from menu.ts and site.ts, baked into every page as the fallback
+src/scripts/shop.ts     browser: live prices, cart (localStorage), add sheet, toast, cart bar
+src/scripts/checkout.ts browser: the /order/ page (lines, pickup or delivery, day and time, estimate, Fillout)
+src/styles/order.css    styles for everything the two scripts draw
+src/lib/order.ts        order links: orderLink(), customTypes, formItem(), formUrl(), OrderType
 src/lib/photos.ts       photo lookup by name; missing photos fall back to a pink placeholder
 src/lib/seo.ts          JSON-LD (Bakery, Product, Breadcrumb, FAQ) and the share image
 src/lib/format.ts       money and price label helpers
@@ -83,39 +93,47 @@ scripts/                make_brand.py (brand assets and favicons), import_photos
 docs/PHOTOS.md          photo names and where each is used
 ```
 
-## Ordering: the contract with the form and the order automation
+## Ordering: the contract with the forms and the order automation
 
-Orders are requests sent through a Fillout form. An automation (Make scenario "BB-01") reads each
-submission, prices it from a Price List spreadsheet, numbers it, logs it and notifies the bakery.
-The website only sends people to the form, but its names must line up with both systems.
+Two Fillout forms feed one automation (Make scenario "BB-01"). It prices every order again from the Price List
+spreadsheet, numbers it, logs it on the Orders sheet, files the customer on the Customers tab, and notifies the
+bakery. The website total is only an estimate; BB-01 flags any difference.
 
-- **Embed.** `src/pages/order.astro` embeds the form `ii1Y1smbD3us` (`site.fillout.formId`) with
-  Fillout's standard embed (`data-fillout-inherit-parameters`, `data-fillout-dynamic-resize`).
-  The embed div is written as raw HTML (`set:html`) on purpose: Fillout forwards every other
-  `data-*` attribute on that div as a URL parameter, and Astro's scoped `data-astro-cid-*`
-  attribute would leak into the form. Keep it that way.
-- **Loading.** A bee loader covers the panel until Fillout sets the frame height. If no height
-  arrives 1.5 s after the frame loads (a background tab, say), the script gives the frame a
-  usable height until Fillout sends the real one. After 12 s without the form,
-  `html.form-slow` highlights the "Open it in a new tab" link.
-- **Order buttons.** Every order button calls `orderLink({ type, item })`, which links to
-  `/order/?type=...&item=...#form`. The Order page shows "You picked ..." and the embed passes
-  both values to the form.
-- **Item names.** `formItem(product, tier)` builds `"<product name> · <tier label>"`
-  (space, middle dot U+00B7, space), e.g. `Cinnamon Rolls · 4 rolls`. That exact text must match
-  (1) the options in the form's Item 1 to Item 5 dropdowns and (2) the Item and Size columns of the
-  Price List sheet. Renaming a product or a size here means Jacob must rename it in Fillout and
-  on the sheet too, so call it out whenever you change a name or a tier label. If they differ,
-  requests still arrive but are flagged "Not on the price list".
-- **Order types.** `type` must be one of the form's options, exactly:
-  `Menu items`, `Custom cake`, `Custom treats`, `Catering`, `Event booking` (`OrderType`).
-- **Prices.** `menu.ts` prices and the delivery rules in `site.ts` (flat fee, threshold, percent,
-  radius) should match the Price List sheet that the automation uses for suggested totals.
-  Price changes come from Jacob; never guess a price.
-- **Form link.** `links.orderForm` is the form's public custom link,
+- **Menu orders: the cart.** Anything with `data-add="<slug>"` (and optionally `data-size="<tier label>"`) opens the
+  add sheet: product tiles, the size buttons on product pages, the order page picker. `src/scripts/shop.ts` keeps the
+  cart in localStorage (`bb-cart-v1`, lines merge when item, size, flavor and add-ons match), shows a toast and a
+  cart bar, and updates `[data-price-from]`, `[data-tier]`, `[data-cart-count]`.
+- **Checkout.** `/order/` (`src/pages/order/index.astro`, `src/scripts/checkout.ts`) lists the lines, asks pickup or
+  delivery (address), the day (earliest = longest lead time of the items) and a time window, shows the estimate, then
+  embeds the "Busy Biese · Checkout" form (`site.fillout.checkoutFormId`) from `embed.fillout.com` with these URL
+  parameters, which must stay defined in that form's Settings > URL parameters:
+  `cart` (JSON, see `cartParam()` in `shop-core.ts`), `items` (readable summary), `plan` (readable pickup or delivery,
+  day, time), `est`, `date` (YYYY-MM-DD), `time`, `fulfillment` (Pickup or Delivery), `address`, `ref`
+  (W-XXXXXX, stays the same until the order is sent), `src` (website). The form itself only asks name, phone,
+  email, contact preference, notes and the email opt-in. When the form posts `form_submit`, the page thanks the
+  customer and empties the cart. Form changes need Publish in Fillout.
+- **Slugs and sizes.** Cart lines name items by the Price List's "Site slug" and "Size" columns, which are the
+  `menu.ts` slug and tier label. Keep slugs stable. A size renamed here must be renamed on the sheet word for word.
+- **Live prices.** `site.priceFeed` holds CSV links to the Price List's Menu, Add-ons and Settings tabs. When set,
+  sizes, prices, flavors, add-ons, delivery fees and time windows come from the sheet (cached 5 minutes per visitor);
+  a size or item set to Active = No disappears, and a new row on the sheet shows up in the order page picker even
+  without a product page. When empty or unreachable, `menu.ts` and `site.ts` are used (`src/lib/shop-build.ts`).
+- **Estimate parity.** `priceLine()` and `cartTotals()` in `shop-core.ts` mirror BB-01's pricing: per line, size price
+  times how many, plus add-ons ("each" times the count, otherwise once per line); delivery is the flat fee up to the
+  threshold, then a percent of the subtotal. Change both together.
+- **Custom requests.** Custom cakes, custom treats, catering and events go to the "Busy Biese · Order request" form
+  (`site.fillout.formId`) on `/order/request/`. `orderLink({ type })` builds those links; `type` preselects "Order type"
+  in the form. Order types are exactly `Custom cake`, `Custom treats`, `Catering`, `Event booking` (and `Menu items`).
+- **Embed of the request form.** It uses Fillout's standard embed (`data-fillout-inherit-parameters`,
+  `data-fillout-dynamic-resize`). The embed div is written as raw HTML (`set:html`) on purpose: Fillout forwards every
+  other `data-*` attribute on that div as a URL parameter, and Astro's scoped `data-astro-cid-*` attribute would leak
+  into the form. Keep it that way. A bee loader covers the panel until Fillout sets the height.
+- **Time windows.** `site.delivery.windows` (label plus hours, e.g. "Midday (11 to 2)") match the request form and the
+  Price List setting `time_windows`, which the live feed uses at checkout. "Flexible" is always offered too.
+- **Form link.** `links.orderForm` is the request form's public custom link,
   `https://intakeforms.fillout.com/BusyBieseBakery`. The older `/busybiese` link is dead.
-- **Still to do in Fillout (Jacob):** Settings > URL parameters, add `type` and `item`, and set
-  the defaults of "Order type" to `@type` and "Item 1" to `@item`, so the form preselects them.
+- **Tests.** Before shipping a change to ordering, run the estimate parity test (random carts priced by the site and
+  by BB-01's code) and a browser pass over add, change, remove, checkout and the thank-you state.
 
 ## Design: Busy Biese Visual System 1.0
 
@@ -172,13 +190,13 @@ The website only sends people to the form, but its names must line up with both 
 
 ## Open items (October 2026)
 
-- Fillout URL parameters (see Ordering).
+- Live prices: `site.priceFeed` is empty until Jacob chooses how the Price List is shared with the site.
 - No photo yet for the Chocolate Covered Strawberry Box.
 - Contact email and phone are blank in `site.ts`, so they are hidden; add them when Jacob confirms.
 - Brownie prices: the site uses 4 for $14, 9 for $32, 18 for $63, 36 for $126; an older price
   sheet differs. Confirm with Jacob before changing.
-- Delivery windows: the site lists Morning (8:00 AM) and Midday (12 to 2 PM), while the form offers
-  Morning (8 to 11), Midday (11 to 2), Afternoon (2 to 5) and Evening (5 to 8). Ask Jacob which is right.
+- Delivery windows: the site now uses the form's four windows (Morning 8 to 11, Midday 11 to 2, Afternoon 2 to 5,
+  Evening 5 to 8), replacing the older 8:00 AM and 12 to 2 PM copy. Jacob to confirm with Safiyyah.
 - How drinks are sold, and the gift add-ons (gift box, ribbon, note), are not settled.
 - Optional: Google Search Console with `sitemap-index.xml`, a Google Business Profile, and GA4
   (`analytics.ga4` in `site.ts`).

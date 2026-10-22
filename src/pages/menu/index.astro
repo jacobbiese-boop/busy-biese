@@ -4,7 +4,6 @@ import ProductList from '../../components/ProductList.astro';
 import PageHero from '../../components/PageHero.astro';
 import { categories, productsIn, products } from '../../data/menu';
 import { site } from '../../config/site';
-import { orderLink } from '../../lib/order';
 import { breadcrumbJsonLd } from '../../lib/seo';
 
 const ld = [
@@ -32,7 +31,6 @@ const ld = [
     })),
   },
 ];
-const order = orderLink({ type: 'Menu items' });
 ---
 
 <Base
@@ -43,7 +41,7 @@ const order = orderLink({ type: 'Menu items' });
   <PageHero
     eyebrow="The menu"
     title="Everything we make, <em>made to order</em>"
-    lead={`${products.length} bakes, boxes, and trays, each made fresh for you. Tap an item to order it, or open its details for sizes, flavors, and allergens.`}
+    lead={`${products.length} bakes, boxes, and trays, each made fresh for you. Tap an item to add it to your order, or open its details for sizes, flavors, and allergens.`}
     tone="pink"
   >
     <ul class="facts" role="list">
@@ -92,17 +90,12 @@ const order = orderLink({ type: 'Menu items' });
         <div>
           <h2>Ready when you are.</h2>
           <p>
-            Send us your order at least {site.ordering.noticeHours} hours ahead. Planning for a big group? We put
-            together custom quotes for large orders.
+            Add what you like, pick a day at least {site.ordering.noticeHours} hours ahead, and send it to us. Planning
+            for a big group? We put together custom quotes for large orders.
           </p>
         </div>
         <div class="btn-row">
-          <a
-            class="btn"
-            href={order.href}
-            target={order.external ? '_blank' : undefined}
-            rel={order.external ? 'noopener' : undefined}>Open the order form</a
-          >
+          <a class="btn" href="/order/">Review your order</a>
           <a class="btn btn-outline" href="/catering/">Catering &amp; large orders</a>
         </div>
       </div>

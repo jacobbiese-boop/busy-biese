@@ -23,7 +23,8 @@ export interface SiteConfig {
   };
   serviceAreaTowns: string[];
   links: { orderForm: string; instagram: string; instagramHandle: string; whatsapp: string };
-  fillout: { formId: string };
+  fillout: { formId: string; checkoutFormId: string };
+  priceFeed: { menu: string; addons: string; settings: string };
   contact: { email: string; phone: string };
   announcement: string;
   ordering: { noticeHours: number; largeOrderPieces: number };
@@ -32,7 +33,8 @@ export interface SiteConfig {
     flatFee: number;
     flatFeeUpTo: number;
     percentOver: number;
-    windows: { label: string; time: string }[];
+    /** label + hours make the window name used at checkout and on the calendar, e.g. "Midday (11 to 2)". */
+    windows: { label: string; hours: string; time: string }[];
   };
   analytics: { ga4: string };
 }
@@ -87,12 +89,28 @@ export const site: SiteConfig = {
   },
 
   /**
-   * Fillout embed: the "Busy Biese · Order request" form, shown right on the
-   * Order page. The ID comes from Fillout (Share > Embed). Leave it empty to
-   * show a button that opens the form in a new tab instead.
+   * Fillout forms (IDs from Fillout, Share > Embed).
+   * formId: "Busy Biese · Order request", for custom cakes, custom treats,
+   *   catering and events, embedded on /order/request/. Leave it empty to show
+   *   a button that opens the form in a new tab instead.
+   * checkoutFormId: "Busy Biese · Checkout", the last step on /order/ (name,
+   *   phone, email). The cart travels to it as URL parameters.
    */
   fillout: {
     formId: 'ii1Y1smbD3us',
+    checkoutFormId: 'dnMEoUMuvrus',
+  },
+
+  /**
+   * Live prices: CSV links to the Price List's Menu, Add-ons and Settings tabs.
+   * When set, the site reads sizes, prices, flavors, add-ons, delivery fees and
+   * time windows from the sheet (cached for 5 minutes per visitor). When empty,
+   * or if the sheet cannot be reached, the prices in src/data/menu.ts are used.
+   */
+  priceFeed: {
+    menu: '',
+    addons: '',
+    settings: '',
   },
 
   /** Leave blank to hide. Add once the business email or phone is set up. */
@@ -114,9 +132,12 @@ export const site: SiteConfig = {
     flatFee: 5,
     flatFeeUpTo: 100,
     percentOver: 10,
+    // The same windows as the order form and the Price List (Settings, time_windows).
     windows: [
-      { label: 'Morning', time: '8:00 AM' },
-      { label: 'Midday', time: '12:00 PM to 2:00 PM' },
+      { label: 'Morning', hours: '8 to 11', time: '8 to 11 AM' },
+      { label: 'Midday', hours: '11 to 2', time: '11 AM to 2 PM' },
+      { label: 'Afternoon', hours: '2 to 5', time: '2 to 5 PM' },
+      { label: 'Evening', hours: '5 to 8', time: '5 to 8 PM' },
     ],
   },
 
