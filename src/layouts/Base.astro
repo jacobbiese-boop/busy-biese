@@ -13,6 +13,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Bee from '../components/Bee.astro';
 import { site } from '../config/site';
+import { siteVersion } from '../config/version';
 
 interface Props {
   /** Page name, e.g. "Cinnamon Rolls". Leave empty on the home page. */
@@ -62,6 +63,7 @@ const ga4 = site.analytics.ga4;
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3" />
     <link rel="manifest" href="/site.webmanifest?v=3" />
     <meta name="theme-color" content="#FBF7F2" />
+    <meta name="busy-biese-version" content={siteVersion} />
 
     <link rel="preload" href={jostUrl} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={cormorantUrl} as="font" type="font/woff2" crossorigin />

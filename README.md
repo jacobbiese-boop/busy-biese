@@ -56,6 +56,11 @@ The "Open it in a new tab" link under the form uses the form's public link,
 how deploys work, the ordering contract, the design rules and the open items. Keep it current
 when something important changes. Private notes go in `CLAUDE.local.md`, which is not committed.
 
+Changes are usually planned and previewed in Cowork, which saves each approved version as a zip
+in Google Drive (My Drive > Nexus > Busy Biese). Claude Code applies the zip and pushes it; the
+steps are in `CLAUDE.md` under "Versions from Cowork". The live version number is in the page
+head as `<meta name="busy-biese-version">`.
+
 ## Motion
 
 The bee is the one thing on the site that moves: it flies in on the home page (tap it for a

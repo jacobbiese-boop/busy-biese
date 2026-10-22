@@ -23,7 +23,8 @@ npm i --no-save @astrojs/check typescript && npx astro check   # type check, exp
 
 - Every commit on `main` triggers a Hostinger build (`npm run build`, output `dist`, Node 24).
   The live site updates about a minute later. There is no staging site.
-- Work on a branch and open a pull request; Jacob merges it (merging deploys). Never force push `main`.
+- Most changes arrive as version zips from Cowork (next section). Anything else: work on a branch,
+  open a pull request and wait for Jacob's OK before it reaches `main`. Never force push `main`.
 - After a deploy, check the live page, not only the local build:
   - HTML is served uncached (`x-hcdn-cache-status: DYNAMIC`), so page changes show at once.
   - Static files are cached by Hostinger's CDN for 30 days. When an icon or image changes,
@@ -32,10 +33,41 @@ npm i --no-save @astrojs/check typescript && npx astro check   # type check, exp
   - The CDN re-encodes larger PNG and WebP files, so live bytes differ from the repo even when
     the image is identical. Compare decoded pixels, not file hashes.
 
+## Versions from Cowork
+
+Jacob plans and reviews changes with Claude in Cowork. Cowork builds each version, shows him a
+preview of the site, and saves a version zip in his Google Drive under My Drive > Nexus > Busy Biese
+(on his PC usually `G:\My Drive\Nexus\Busy Biese`). Once he approves a version he sends you one
+line, such as "Please refer to busy-biese-v1.1.zip and push the edits". That line is his go-ahead
+to push that version, as long as every check below passes.
+
+Each zip holds `VERSION.md` (what changes, in plain words), `manifest.json` (version, base commit,
+each changed file with its SHA-256, files to delete, commit message, tag) and `files/` (the changed
+files at their repo paths). To apply one:
+
+1. Work in the local clone of this repo (clone it if there is none). Check out `main`,
+   `git pull --ff-only`, and make sure the working tree is clean.
+2. `git rev-parse HEAD` must equal the manifest's `base_commit`. If `main` has moved on, stop and
+   tell Jacob so Cowork can rebuild the version on top of it. Never merge by hand.
+3. Copy `files/` over the repo, delete the paths listed in `delete`, and check each file's
+   SHA-256 against the manifest (PowerShell: `Get-FileHash -Algorithm SHA256 <file>`).
+   `git status` must list exactly the manifest's files.
+4. `npm ci`, `npm run build` and the type check must pass.
+5. Commit with the manifest's message, tag it with the manifest's tag, and
+   `git push origin main --follow-tags`.
+6. About a minute later, open https://busybiese.com and confirm the page head shows
+   `<meta name="busy-biese-version" content="...">` with the new version, then look over the
+   pages the version changed.
+7. Tell Jacob in two short lines what went live (version and commit). If any step fails, stop
+   before pushing and tell him what failed; never push a version that did not pass.
+
+`src/config/version.ts` holds the version number; every version zip updates it.
+
 ## Project map
 
 ```
 src/config/site.ts      business settings: links, Fillout form, contact, delivery, announcement, GA4
+src/config/version.ts   the site version, shown in the page head as busy-biese-version
 src/data/menu.ts        every product: names, sizes (tiers), prices, allergens, FAQs, photo names; categories
 src/pages/              index, menu/index, menu/[slug] (one page per product), order, catering, about, policies, 404, robots.txt.ts
 src/layouts/Base.astro  page shell: SEO tags, icons, header, footer, back to top bee, view transitions
